@@ -1,0 +1,7 @@
+/*
+From Firebase to ligin:
+Use this token below
+1//03CdQLH8pxoLTCgYIARAAGAMSNwF-L9Irkjzxv10G-Y2-1Udqrca2tnw5KX37CT4Sj-flXEs0Ktisey24h40Jk6hSzyG61cUZRps
+
+Example: firebase deploy --token "$FIREBASE_TOKEN"
+*/

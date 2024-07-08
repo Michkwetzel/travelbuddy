@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "570991179221",
+    "project_id": "travelai-88a07",
+    "storage_bucket": "travelai-88a07.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:570991179221:android:ece979376b28b427aa395c",
+        "android_client_info": {
+          "package_name": "com.mikeanddave.travel_ai_front"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "570991179221-ql89be407rq677k8obnns1i4oj6ag8oq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBFA57XISN0ufZwIb8WImUnvefeylkkNH8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "570991179221-ql89be407rq677k8obnns1i4oj6ag8oq.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "570991179221-07i8c4uip90aer192gp6fg9b2f7hmdrt.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.travelAiApp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
