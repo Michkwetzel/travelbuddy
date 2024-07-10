@@ -1,4 +1,3 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, prefer_const_declarations
 // Welcome screen
 import 'package:firebase_core/firebase_core.dart';
 import 'package:travel_ai_front/services/auth_service.dart';
