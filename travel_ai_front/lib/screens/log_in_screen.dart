@@ -1,7 +1,9 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
-import 'package:google_sign_in/google_sign_in.dart';
+import 'package:provider/provider.dart';
+import 'package:travel_ai_front/services/auth_service.dart';
+import 'package:travel_ai_front/state/spinner.dart';
+import 'package:travel_ai_front/state/user_model.dart';
 
 class LogInScreen extends StatefulWidget {
   const LogInScreen({super.key});
@@ -11,35 +13,16 @@ class LogInScreen extends StatefulWidget {
 }
 
 class _LogInScreenState extends State<LogInScreen> {
-  final _auth = FirebaseAuth.instance;
-
-  bool showSpinner = false;
   String userEmail = '';
   String userPassword = '';
 
-  Future<UserCredential> signInWithGoogle() async {
-    print("test");
-    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-    final GoogleSignInAuthentication? googleAuth =
-        await googleUser?.authentication;
-    final credential = GoogleAuthProvider.credential(
-      accessToken: googleAuth?.accessToken,
-      idToken: googleAuth?.idToken,
-      
-    );
-
-    final userCred =
-        await FirebaseAuth.instance.signInWithCredential(credential);
-    print(userCred);
-    return userCred;
-  }
-
-
   @override
   Widget build(BuildContext context) {
+    //provide spinner callback to authService
+
     return Scaffold(
       body: ModalProgressHUD(
-        inAsyncCall: showSpinner,
+        inAsyncCall: Provider.of<Spinner>(context).spinner,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 50),
           child: Column(
@@ -47,7 +30,7 @@ class _LogInScreenState extends State<LogInScreen> {
             children: [
               Center(
                   child: ElevatedButton(
-                onPressed: signInWithGoogle,
+                onPressed: Provider.of<AuthService>(context, listen: false).signInWithGoogle,
                 child: Text("Google Log in"),
               )),
               SizedBox(
@@ -62,8 +45,7 @@ class _LogInScreenState extends State<LogInScreen> {
                     userEmail = value;
                   },
                   decoration: InputDecoration(
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(25)),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(25)),
                   )),
               Text("Password"),
               TextField(
@@ -71,41 +53,22 @@ class _LogInScreenState extends State<LogInScreen> {
                     userPassword = value;
                   },
                   decoration: InputDecoration(
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(25)),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(25)),
                   )),
               SizedBox(
                 height: 20,
               ),
               ElevatedButton(
                 onPressed: () async {
-                  try {
-                    setState(() {
-                      showSpinner = true;
-                    });
-                    final user = await _auth.signInWithEmailAndPassword(
-                        email: userEmail, password: userPassword);
-                    setState(() {
-                      showSpinner = false;
-                    });
-                    print(user);
-                  } on Exception catch (e) {
-                    setState(() {
-                      showSpinner = false;
-                    });
-                    print(e);
-                  }
+                  //Sign in with username and Password
+                  Provider.of<AuthService>(context, listen: false).signInWithEmailAndPassword(userEmail, userPassword);
                 },
                 child: Text("Log in"),
               ),
-              ElevatedButton(
-                onPressed: () {
-                  if (FirebaseAuth.instance.currentUser != null) {
-                    print(FirebaseAuth.instance.currentUser?.uid);
-                  }
-                },
-                child: Text("Check"),
-              )
+              Consumer<UserModel>(builder: (context, userModel, child) {
+                return Text(userModel.user);
+              }),
+              FloatingActionButton(onPressed: Provider.of<Spinner>(context, listen: false).showSpinner)
             ],
           ),
         ),
