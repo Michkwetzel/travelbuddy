@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:provider/provider.dart';
 import 'package:travel_ai_front/services/auth_service.dart';
 import 'package:travel_ai_front/state/spinner.dart';
 import 'package:travel_ai_front/state/user_model.dart';
+import 'dart:convert';
+import 'package:travel_ai_front/screens/user_data_capture.dart';
 
 class LogInScreen extends StatefulWidget {
   const LogInScreen({super.key});
@@ -15,6 +18,17 @@ class LogInScreen extends StatefulWidget {
 class _LogInScreenState extends State<LogInScreen> {
   String userEmail = '';
   String userPassword = '';
+  final uri = Uri.parse("http://127.0.0.1:5000//get_user_data");
+
+  void sendRequest(Map<String, dynamic> data) async {
+    final response = await http.post(
+      uri,
+      body: jsonEncode(data),
+      headers: {'Content-Type': 'application/json'}, // Add this line
+    );
+    print('Responce code: ${response.statusCode}');
+    print('Responce code: ${response.body}');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -68,7 +82,18 @@ class _LogInScreenState extends State<LogInScreen> {
               Consumer<UserModel>(builder: (context, userModel, child) {
                 return Text(userModel.user);
               }),
-              FloatingActionButton(onPressed: Provider.of<Spinner>(context, listen: false).showSpinner)
+              TextButton(
+                onPressed: () => sendRequest({'user_uid': 'ExNgWo4XnoRpMjflGJtHix83Td6W2'}),
+                style: ButtonStyle(backgroundColor: WidgetStateProperty.all(Colors.blue)),
+                child: Text(
+                  "Send get request",
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+              TextButton(
+                onPressed: () => (Navigator.push(context, MaterialPageRoute(builder: (context) => userDataCaptureScreen()))),
+                child: Text("User data capture"),
+              )
             ],
           ),
         ),

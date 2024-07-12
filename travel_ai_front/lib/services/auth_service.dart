@@ -51,7 +51,12 @@ class AuthService {
     } on Exception catch (e) {
       _spinner.hideSpinner();
       print(e);
+      if (true) {
+        print("re");
+      }
       return null;
     }
   }
 }
+
+class Hi {}
