@@ -7,3 +7,4 @@ from dotenv import load_dotenv
 load_dotenv('/Users/michaelwetzel/TravelAgent/config/.env')
 
 import agents.main_agent
+
