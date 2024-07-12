@@ -2,10 +2,12 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class HttpService {
-  final backEndUri = 'http://127.0.0.1:5000';
+  final String baseUrl;
 
-  Future<String> postRequest(String path, Map<String, dynamic> data, Map<String,dynamic> headers  {'Content-Type': 'application/json'}) async {
-    final finalUri = Uri.parse('$backEndUri/$path');
+  HttpService({this.baseUrl = 'http://127.0.0.1:5000'});
+
+  Future<String> postRequest(String path, Map<String, dynamic> data, {Map<String,dynamic> headers = const {'Content-Type': 'application/json'}}) async {
+    final finalUri = Uri.parse('$baseUrl/$path');
 
     try {
       final response = await http.post(
