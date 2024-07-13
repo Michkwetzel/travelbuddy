@@ -4,32 +4,48 @@ import 'dart:convert';
 class HttpService {
   final String baseUrl;
 
-  HttpService({this.baseUrl = 'http://127.0.0.1:5000'});
+  HttpService({this.baseUrl = 'http://127.0.0.1:5000/'});
 
-  Future<String> postRequest(String path, Map<String, dynamic> data, {Map<String,dynamic> headers = const {'Content-Type': 'application/json'}}) async {
-    final finalUri = Uri.parse('$baseUrl/$path');
+  /// Sends post request to flask server. returns response.body
+  /// Throws errors if responce code != 200 and any other errors
+  Future<String> postRequest({
+    required String path,
+    required Map<String, dynamic> request,
+    Map<String, String> headers = const {'Content-Type': 'application/json'},
+  }) async {
+    final uri = Uri.parse('$baseUrl$path');
 
     try {
       final response = await http.post(
-        finalUri,
-        body: jsonEncode(data),
-        headers: {'Content-Type': 'application/json'},
+        uri,
+        body: jsonEncode(request),
+        headers: headers,
       );
 
       if (response.statusCode == 200) {
         return response.body;
       } else {
-        // Handle different status codes as needed
-        print('Error: ${response.statusCode}, ${response.reasonPhrase}');
-        return 'Error: ${response.statusCode}';
+        throw HttpException('Request failed with status: ${response.statusCode}');
       }
     } on http.ClientException catch (e) {
-      // Network-related error
-      print('Network error: $e');
-      return 'Network error: $e';
+      throw NetworkException('Network error: $e');
     } catch (e) {
-      print(e);
-      return 'An unexpected error occurred: $e';
+      throw UnexpectedException('An unexpected error occurred: $e');
     }
   }
+}
+
+class HttpException implements Exception {
+  final String message;
+  HttpException(this.message);
+}
+
+class NetworkException implements Exception {
+  final String message;
+  NetworkException(this.message);
+}
+
+class UnexpectedException implements Exception {
+  final String message;
+  UnexpectedException(this.message);
 }

@@ -3,8 +3,8 @@ import 'package:http/http.dart' as http;
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:provider/provider.dart';
 import 'package:travel_ai_front/services/auth_service.dart';
-import 'package:travel_ai_front/state/spinner.dart';
-import 'package:travel_ai_front/state/user_model.dart';
+import 'package:travel_ai_front/change_notifiers/spinner.dart';
+import 'package:travel_ai_front/change_notifiers/user_model.dart';
 import 'dart:convert';
 import 'package:travel_ai_front/screens/user_data_capture.dart';
 
