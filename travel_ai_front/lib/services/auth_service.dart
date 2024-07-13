@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:travel_ai_front/state/spinner.dart';
+import 'package:travel_ai_front/change_notifiers/spinner.dart';
 
 class AuthService {
   final FirebaseAuth _auth;
@@ -51,9 +51,7 @@ class AuthService {
     } on Exception catch (e) {
       _spinner.hideSpinner();
       print(e);
-      if (true) {
-        print("re");
-      }
+
       return null;
     }
   }

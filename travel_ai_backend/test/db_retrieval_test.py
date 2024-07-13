@@ -1,4 +1,4 @@
-from test.firestore_service import FirestoreService
+from services.firestore_service import FirestoreService
 
 firestore = FirestoreService()
 
@@ -10,5 +10,5 @@ uid = "yr2783ghfehide"
 # add a user
 
 newUserUID = "ExNgWo4XnoRpMjflGJtHix83Td6W2"
-print(firestore.add_doc("users", newUserUID, {'age': '30', 'last': 'Jell', 'destination': 'Sri Lanka', 'passport': 'south african', 'email': 'random@gmail.com', 'first': 'Ben', 'location': "new zealand"}))
-
+doc_id = firestore.add_doc("users", {'age': '33', 'last': 'Jell', 'destination': 'Sri Lanka', 'passport': 'south african', 'email': 'random@gmail.com', 'first': 'Ben', 'location': "new zealand"})
+print(doc_id)
