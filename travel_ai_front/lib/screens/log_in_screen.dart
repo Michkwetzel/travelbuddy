@@ -6,7 +6,7 @@ import 'package:travel_ai_front/services/auth_service.dart';
 import 'package:travel_ai_front/change_notifiers/spinner.dart';
 import 'package:travel_ai_front/change_notifiers/user_model.dart';
 import 'dart:convert';
-import 'package:travel_ai_front/screens/user_data_capture.dart';
+import 'package:travel_ai_front/screens/user_data_capture_screen.dart';
 
 class LogInScreen extends StatefulWidget {
   const LogInScreen({super.key});
@@ -91,7 +91,7 @@ class _LogInScreenState extends State<LogInScreen> {
                 ),
               ),
               TextButton(
-                onPressed: () => (Navigator.push(context, MaterialPageRoute(builder: (context) => userDataCaptureScreen()))),
+                onPressed: () => (Navigator.push(context, MaterialPageRoute(builder: (context) => UserDataCaptureScreen()))),
                 child: Text("User data capture"),
               )
             ],

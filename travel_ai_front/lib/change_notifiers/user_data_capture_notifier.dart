@@ -8,18 +8,18 @@ class UserDataCaptureNotifier with ChangeNotifier {
 
   void updateUserDataCapture(String field, String value) {
     switch (field) {
-      case "Name":
+      case "name":
         _userData.name = value;
       case "surname":
-        _userData.name = value;
+        _userData.surname = value;
       case "passport":
-        _userData.name = value;
+        _userData.passport = value;
       case "destination":
-        _userData.name = value;
+        _userData.destination = value;
       case "age":
-        _userData.name = value;
+        _userData.age = value;
       case "travelBudget":
-        _userData.name = value;
+        _userData.travelBudget = value;
     }
     notifyListeners();
   }

@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:travel_ai_front/change_notifiers/user_data_capture_notifier.dart';
+import 'package:travel_ai_front/services/db_service.dart';
 
-class userDataCaptureScreen extends StatefulWidget {
-  const userDataCaptureScreen({super.key});
+class UserDataCaptureScreen extends StatefulWidget {
+  const UserDataCaptureScreen({super.key});
 
   @override
-  State<userDataCaptureScreen> createState() => _userDataCaptureScreenState();
+  State<UserDataCaptureScreen> createState() => _UserDataCaptureScreenState();
 }
 
-class _userDataCaptureScreenState extends State<userDataCaptureScreen> {
+class _UserDataCaptureScreenState extends State<UserDataCaptureScreen> {
   final _formKey = GlobalKey<FormState>();
+  final _dbService = DbService();
 
   @override
   Widget build(BuildContext context) {
@@ -19,11 +21,12 @@ class _userDataCaptureScreenState extends State<userDataCaptureScreen> {
     return Scaffold(
       backgroundColor: Colors.purple[50],
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
+        onPressed: () async {
           if (_formKey.currentState!.validate()) {
-            _formKey.currentState!.save();
+            // If the validation rules passed
+            _formKey.currentState!.save(); // Save the current state of the text fields
             final userData = userDataNotifier.userData;
-            print(userData.toString());
+            print(await _dbService.writeToDB('users', userData.toMap()));
           }
         },
         backgroundColor: Colors.white,
@@ -34,8 +37,7 @@ class _userDataCaptureScreenState extends State<userDataCaptureScreen> {
         ),
       ),
       body: Form(
-        key: _formKey, // Add this line
-
+        key: _formKey,
         child: Column(
           children: [
             SizedBox(
@@ -43,27 +45,27 @@ class _userDataCaptureScreenState extends State<userDataCaptureScreen> {
             ),
             DataField(
               text: "Name",
-              onSaved: (value) => userDataNotifier.updateUserDataCapture("Name", value!),
+              onSaved: (value) => userDataNotifier.updateUserDataCapture("name", value!),
             ),
             DataField(
               text: "Surname",
-              onSaved: (value) => userDataNotifier.updateUserDataCapture("Surname", value!),
+              onSaved: (value) => userDataNotifier.updateUserDataCapture("surname", value!),
             ),
             DataField(
               text: "Passport",
-              onSaved: (value) => userDataNotifier.updateUserDataCapture("Passport", value!),
+              onSaved: (value) => userDataNotifier.updateUserDataCapture("passport", value!),
             ),
             DataField(
               text: "Destination",
-              onSaved: (value) => userDataNotifier.updateUserDataCapture("Destination", value!),
+              onSaved: (value) => userDataNotifier.updateUserDataCapture("destination", value!),
             ),
             DataField(
               text: "Age",
-              onSaved: (value) => userDataNotifier.updateUserDataCapture("Age", value!),
+              onSaved: (value) => userDataNotifier.updateUserDataCapture("age", value!),
             ),
             DataField(
               text: "Travel budget",
-              onSaved: (value) => userDataNotifier.updateUserDataCapture("Travel budget", value!),
+              onSaved: (value) => userDataNotifier.updateUserDataCapture("travelBudget", value!),
             )
           ],
         ),
@@ -76,7 +78,7 @@ class DataField extends StatelessWidget {
   const DataField({super.key, required this.text, required this.onSaved});
 
   final String text;
-  final void Function(String?)? onSaved; // Add this line
+  final void Function(String?)? onSaved;
 
   @override
   Widget build(BuildContext context) {
@@ -89,7 +91,10 @@ class DataField extends StatelessWidget {
             width: 20,
           ),
           Expanded(
-            child: TextField(onChanged: (value) => {}, decoration: InputDecoration(border: OutlineInputBorder())),
+            child: TextFormField(
+              onSaved: onSaved,
+              decoration: InputDecoration(border: OutlineInputBorder()),
+            ),
           )
         ],
       ),

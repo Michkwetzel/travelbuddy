@@ -10,4 +10,15 @@ class UserDataCapture {
   String toString() {
     return 'UserDataCapture(name: $name, surname: $surname, passport: $passport, destination: $destination, age: $age, travelBudget: $travelBudget)';
   }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'name': name,
+      'surname': surname,
+      'passport': passport,
+      'destination': destination,
+      'age': age,
+      'travelBudget': travelBudget,
+    };
+  }
 }
