@@ -20,7 +20,7 @@ void main() async {
         ChangeNotifierProvider(create: (context) => UserModel()),
         ChangeNotifierProvider(create: (context) => Spinner()),
         ChangeNotifierProvider(create: (context) => UserDataCaptureNotifier()),
-        Provider(create: (context) => AuthService(spinner: context.read<Spinner>())),
+        Provider(create: (context) => AuthService(spinner: context.read<Spinner>(), userModel: context.read<UserModel>())),
       ],
       child: MaterialApp(
         home: WelcomeScreen(),

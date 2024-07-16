@@ -17,15 +17,12 @@ class WelcomeScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Center(
-                child: Text("Welcome to TravelAI",
-                    style: TextStyle(fontSize: 25))),
+            Center(child: Text("Welcome to TravelAI", style: TextStyle(fontSize: 25))),
             SizedBox(
               height: 30,
             ),
             ElevatedButton(
-              onPressed: () => Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => LogInScreen())),
+              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => LogInScreen())),
               child: Text("Log in"),
             ),
             SizedBox(
@@ -33,8 +30,7 @@ class WelcomeScreen extends StatelessWidget {
             ),
             ElevatedButton(
               style: ButtonStyle(),
-              onPressed: () => Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => RegisterScreen())),
+              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => RegisterScreen())),
               child: Text("Register"),
             ),
           ],
