@@ -26,3 +26,8 @@ linter:
     prefer_const_literals_to_create_immutables: false
 # Additional information about this file can be found at
 # https://dart.dev/guides/language/analysis-options
+
+formatter:
+  line-length: 200
+  indent:
+    - size: 4

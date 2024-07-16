@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:provider/provider.dart';
+import 'package:travel_ai_front/screens/chatbot_screen.dart';
 import 'package:travel_ai_front/services/auth_service.dart';
 import 'package:travel_ai_front/change_notifiers/spinner.dart';
 import 'package:travel_ai_front/change_notifiers/user_model.dart';
@@ -18,17 +19,6 @@ class LogInScreen extends StatefulWidget {
 class _LogInScreenState extends State<LogInScreen> {
   String userEmail = '';
   String userPassword = '';
-  final uri = Uri.parse("http://127.0.0.1:5000//get_user_data");
-
-  void sendRequest(Map<String, dynamic> data) async {
-    final response = await http.post(
-      uri,
-      body: jsonEncode(data),
-      headers: {'Content-Type': 'application/json'}, // Add this line
-    );
-    print('Responce code: ${response.statusCode}');
-    print('Responce code: ${response.body}');
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +34,9 @@ class _LogInScreenState extends State<LogInScreen> {
             children: [
               Center(
                   child: ElevatedButton(
-                onPressed: Provider.of<AuthService>(context, listen: false).signInWithGoogle,
+                onPressed: () {
+                  Provider.of<AuthService>(context, listen: false).signInWithGoogle(() => Navigator.push(context, MaterialPageRoute(builder: (context) => ChatbotScreen())));
+                },
                 child: Text("Google Log in"),
               )),
               SizedBox(
@@ -75,15 +67,24 @@ class _LogInScreenState extends State<LogInScreen> {
               ElevatedButton(
                 onPressed: () async {
                   //Sign in with username and Password
-                  Provider.of<AuthService>(context, listen: false).signInWithEmailAndPassword(userEmail, userPassword);
+                  await Provider.of<AuthService>(context, listen: false)
+                      .signInWithEmailAndPassword(userEmail, userPassword, () => Navigator.push(context, MaterialPageRoute(builder: (context) => ChatbotScreen())));
                 },
                 child: Text("Log in"),
               ),
               Consumer<UserModel>(builder: (context, userModel, child) {
-                return Text(userModel.user);
+                return Text(userModel.currentUser);
               }),
               TextButton(
-                onPressed: () => sendRequest({'user_uid': 'ExNgWo4XnoRpMjflGJtHix83Td6W2'}),
+                onPressed: () => {Provider.of<AuthService>(context, listen: false).signOut()},
+                style: ButtonStyle(backgroundColor: WidgetStateProperty.all(Colors.blue)),
+                child: Text(
+                  "Sign out",
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+              TextButton(
+                onPressed: () => {},
                 style: ButtonStyle(backgroundColor: WidgetStateProperty.all(Colors.blue)),
                 child: Text(
                   "Send get request",

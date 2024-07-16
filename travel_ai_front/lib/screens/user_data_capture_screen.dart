@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:travel_ai_front/change_notifiers/user_data_capture_notifier.dart';
+import 'package:travel_ai_front/change_notifiers/user_model.dart';
 import 'package:travel_ai_front/services/db_service.dart';
 
 class UserDataCaptureScreen extends StatefulWidget {
@@ -17,6 +18,7 @@ class _UserDataCaptureScreenState extends State<UserDataCaptureScreen> {
   @override
   Widget build(BuildContext context) {
     final userDataNotifier = Provider.of<UserDataCaptureNotifier>(context, listen: false);
+    final signedInUser = Provider.of<UserModel>(context, listen: false);
 
     return Scaffold(
       backgroundColor: Colors.purple[50],
@@ -26,7 +28,7 @@ class _UserDataCaptureScreenState extends State<UserDataCaptureScreen> {
             // If the validation rules passed
             _formKey.currentState!.save(); // Save the current state of the text fields
             final userData = userDataNotifier.userData;
-            print(await _dbService.writeToDB('users', userData.toMap()));
+            print(await _dbService.writeToDB(collection: 'users',data:  userData.toMap(), docId: signedInUser.currentUser));
           }
         },
         backgroundColor: Colors.white,
