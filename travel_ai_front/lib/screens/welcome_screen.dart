@@ -2,6 +2,7 @@
 // Welcome screen
 
 import 'package:flutter/material.dart';
+import 'package:travel_ai_front/screens/chatbot_screen.dart';
 import 'package:travel_ai_front/screens/log_in_screen.dart';
 import 'package:travel_ai_front/screens/register_screen.dart';
 
@@ -17,7 +18,7 @@ class WelcomeScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Center(child: Text("Welcome to TravelAI", style: TextStyle(fontSize: 25))),
+            Center(child: Text("Welcome to Travel Buddy", style: TextStyle(fontSize: 25))),
             SizedBox(
               height: 30,
             ),
@@ -33,6 +34,10 @@ class WelcomeScreen extends StatelessWidget {
               onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => RegisterScreen())),
               child: Text("Register"),
             ),
+            ElevatedButton(
+              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ChatbotScreen())),
+              child: Text("ChatBot Screen"),
+            )
           ],
         ),
       ),
