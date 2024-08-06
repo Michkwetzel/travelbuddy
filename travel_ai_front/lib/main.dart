@@ -1,6 +1,5 @@
 // Welcome screen
 import 'package:firebase_core/firebase_core.dart';
-import 'package:travel_ai_front/change_notifiers/side_panel_state.dart';
 import 'package:travel_ai_front/change_notifiers/user_data_capture_notifier.dart';
 import 'package:travel_ai_front/services/auth_service.dart';
 import 'package:travel_ai_front/change_notifiers/spinner.dart';
@@ -21,7 +20,6 @@ void main() async {
         ChangeNotifierProvider(create: (context) => UserModel()),
         ChangeNotifierProvider(create: (context) => Spinner()),
         ChangeNotifierProvider(create: (context) => UserDataCaptureNotifier()),
-        ChangeNotifierProvider(create: (context) => SidePanelState()),
         Provider(create: (context) => AuthService(spinner: context.read<Spinner>(), userModel: context.read<UserModel>())),
       ],
       child: MaterialApp(
