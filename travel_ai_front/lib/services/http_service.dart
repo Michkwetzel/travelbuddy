@@ -8,19 +8,11 @@ class HttpService {
 
   /// Sends post request to flask server. returns response.body
   /// Throws errors if responce code != 200 and any other errors
-  Future<String> postRequest({
-    required String path,
-    required Map<String, dynamic> request,
-    Map<String, String> headers = const {'Content-Type': 'application/json'},
-  }) async {
+  Future<String> postRequest({required String path, required Map<String, dynamic> request, Map<String, String> headers = const {'Content-Type': 'application/json'}}) async {
     final uri = Uri.parse('$baseUrl$path');
 
     try {
-      final response = await http.post(
-        uri,
-        body: jsonEncode(request),
-        headers: headers,
-      );
+      final response = await http.post(uri, body: jsonEncode(request), headers: headers);
 
       if (response.statusCode == 200) {
         return response.body;

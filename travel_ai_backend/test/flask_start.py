@@ -63,4 +63,44 @@ def write_to_db():
             return firestore.add_doc(collection, data, doc_id)
 
     except Exception as e:  # Catch-all for other errors
-        return jsonify({"status": "error", "message": "An error occurred"}), 500  # Internal Server Error
+        return jsonify({"status": "error", "message": "An error occurred"})  # Internal Server Error
+
+@app.route('/receive_user_massage', methods=['POST'])
+def receive_user_message():
+    """
+    Listens for user message and initiates LLM logic
+    request body: userID, chatID, message, timestamp
+    :return status code
+    """
+    request_body = request.get_json()
+
+    # Checks if all fields present
+    all_fields_present, missing_fields = check_required_fields(request_body, ['userID', 'chatID', 'message', 'timestamp'])
+
+    if not all_fields_present:
+        print("Error, Missing fields: " + missing_fields)
+        return jsonify({"status": "error", "message": f'Missing fields: " + {missing_fields}'})
+
+    userID = request_body.get('userID')
+    chatID = request_body.get('chatID')
+    message = request_body.get('message')
+    timestamp = request_body.get('timestamp')
+
+    menssage_entry = {'message': message, 'role': 'user'}
+
+    #All fields present
+    return firestore.add_doc(doc_path= f'users/{userID}/chats/{chatID}/messages', doc_id=timestamp, fields_dict=menssage_entry)
+
+
+
+def check_required_fields(request_body, required_fields):
+    missing_fields = []
+
+    for field in required_fields:
+        if field not in request_body:
+            missing_fields.append(field)
+
+    if missing_fields:
+        return False, missing_fields  # Return False and a list of missing fields
+
+    return True, None

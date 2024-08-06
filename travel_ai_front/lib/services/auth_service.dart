@@ -8,6 +8,7 @@ import 'package:travel_ai_front/change_notifiers/user_model.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  // ignore: unused_field
   StreamSubscription<User?>? _authStateSubscription;
   UserModel _userModel; // Store the subscription
 

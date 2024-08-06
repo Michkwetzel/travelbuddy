@@ -31,3 +31,6 @@ formatter:
   line-length: 200
   indent:
     - size: 4
+analyzer:
+  errors:
+    non_constant_identifier_names: ignore
