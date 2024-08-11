@@ -77,8 +77,6 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
                         Map<String, dynamic> data = message.data() as Map<String, dynamic>;
                         final text = data['message'];
                         final role = data['role'];
-                        print(text);
-                        print(role);
                         final messageWidget = MessageBuble(message: text, sender: role);
                         messageWidgets.add(messageWidget);
                       }
@@ -116,7 +114,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
                         IconButton(
                             onPressed: () async {
                               messageTextController.clear();
-                              String response = await messageService.sendMessage(chatRoomID: '1', userMessage: userMessage);
+                              String response = await messageService.sendMessage(chatRoomID: 'Chat1', userMessage: userMessage);
                               print(response);
                             },
                             icon: Icon(Icons.send))

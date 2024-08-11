@@ -14,17 +14,4 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (context) => UserModel()),
-        ChangeNotifierProvider(create: (context) => Spinner()),
-        ChangeNotifierProvider(create: (context) => UserDataCaptureNotifier()),
-        Provider(create: (context) => AuthService(spinner: context.read<Spinner>(), userModel: context.read<UserModel>())),
-      ],
-      child: MaterialApp(
-        home: WelcomeScreen(),
-      ),
-    ),
-  );
 }

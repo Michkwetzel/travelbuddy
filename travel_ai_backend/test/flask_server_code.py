@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 import sys
 import os
+import datetime
 
 #to get relative paths.
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -8,8 +9,10 @@ parent_dir = os.path.dirname(current_dir)
 sys.path.append(parent_dir)
 
 from services.firestore_service import FirestoreService
+from agents.main_agent import ChatBot
 
 firestore = FirestoreService()
+chat_bot = ChatBot()
 app = Flask(__name__)
 
 @app.route('/add_new_user', methods=['POST'])
@@ -86,11 +89,23 @@ def receive_user_message():
     message = request_body.get('message')
     timestamp = request_body.get('timestamp')
 
-    menssage_entry = {'message': message, 'role': 'user'}
+    user_message_entry = {'message': message, 'role': 'user'}
 
-    #All fields present
-    return firestore.add_doc(doc_path= f'users/{userID}/chats/{chatID}/messages', doc_id=timestamp, fields_dict=menssage_entry)
+    # Save user message to cloud DB
+    message_collection_path = f'users/{userID}/chats/{chatID}/messages'
+    response = firestore.add_doc(doc_path=message_collection_path, doc_id=timestamp, fields_dict=user_message_entry)
 
+    llm_response = chat_bot.send_Request(message)
+    llm_message_entry = {
+         'message': llm_response,
+         'role': 'assistant'
+    }
+    print(llm_message_entry)
+
+    timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
+    # Save LLM response to cloud DB
+    firestore.add_doc(doc_path=message_collection_path, doc_id=timestamp, fields_dict=llm_message_entry)
+    return "Hi"
 
 
 def check_required_fields(request_body, required_fields):
