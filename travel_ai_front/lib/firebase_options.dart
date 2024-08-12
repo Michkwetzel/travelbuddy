@@ -64,6 +64,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '570991179221',
     projectId: 'travelai-88a07',
     storageBucket: 'travelai-88a07.appspot.com',
+    androidClientId: '570991179221-nb68np7lfp1rpr8k00amgb99hm3i6vmp.apps.googleusercontent.com',
     iosClientId: '570991179221-ohqp7sd35ep87smeho4vqibonej3lm54.apps.googleusercontent.com',
     iosBundleId: 'com.example.travelAiFront',
   );
