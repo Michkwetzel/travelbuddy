@@ -4,7 +4,7 @@ from firebase_admin import credentials, firestore
 
 # Firebase initialization (ideally, do this once in your app's entry point)
 cred = credentials.Certificate(
-    '/Users/michaelwetzel/travelai/keys/travelai-88a07-firebase-adminsdk-1gica-f571bc970b.json')  # Replace with your path
+    '/Users/michaelwetzel/travelbuddy/keys/travelai-88a07-firebase-adminsdk-1gica-f571bc970b.json')  # Replace with your path
 firebase_admin.initialize_app(cred)
 
 
