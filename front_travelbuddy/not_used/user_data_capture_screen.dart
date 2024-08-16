@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:front_travelbuddy/change_notifiers/user_data_capture_notifier.dart';
+import 'user_data_capture_notifier.dart';
 import 'package:front_travelbuddy/change_notifiers/user_model.dart';
 import 'package:front_travelbuddy/services/db_service.dart';
 
