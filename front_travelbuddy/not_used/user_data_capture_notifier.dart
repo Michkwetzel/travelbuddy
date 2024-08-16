@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:front_travelbuddy/state_files/user_data_capture.dart';
+import 'state_files/user_data_capture.dart';
 
 class UserDataCaptureNotifier with ChangeNotifier {
   UserDataCapture _userData = UserDataCapture();

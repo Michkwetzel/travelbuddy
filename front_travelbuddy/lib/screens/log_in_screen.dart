@@ -5,7 +5,6 @@ import 'package:front_travelbuddy/screens/chatbot_screen.dart';
 import 'package:front_travelbuddy/services/auth_service.dart';
 import 'package:front_travelbuddy/change_notifiers/spinner.dart';
 import 'package:front_travelbuddy/change_notifiers/user_model.dart';
-import 'package:front_travelbuddy/screens/user_data_capture_screen.dart';
 import 'package:front_travelbuddy/services/http_service.dart';
 
 class LogInScreen extends StatefulWidget {
@@ -104,7 +103,7 @@ class _LogInScreenState extends State<LogInScreen> {
                 ),
               ),
               TextButton(
-                onPressed: () => (Navigator.push(context, MaterialPageRoute(builder: (context) => UserDataCaptureScreen()))),
+                onPressed: () => (),
                 child: Text("User data capture"),
               )
             ],

@@ -62,14 +62,12 @@ class AuthService {
     googleProvider.setCustomParameters({'login_hint': 'user@example.com'});
 
     try {
-      _spinner.showSpinner();
-      var userCred = await FirebaseAuth.instance.signInWithPopup(googleProvider);
-      _spinner.hideSpinner();
+      _auth.signOut();
+      var userCred = await _auth.signInWithPopup(googleProvider);
       nextScreen();
       return userCred;
     } on Exception catch (e) {
-      _spinner.hideSpinner();
-      print(e);
+      print('error: $e');
       return null;
     }
   }
