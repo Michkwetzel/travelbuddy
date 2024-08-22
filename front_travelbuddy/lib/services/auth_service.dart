@@ -70,6 +70,7 @@ class AuthService {
 
     try {
       _auth.signOut();
+      print("Is new user");
       var userCred = await _auth.signInWithPopup(googleProvider);
 
       if (userCred.additionalUserInfo!.isNewUser) {
@@ -114,6 +115,8 @@ class AuthService {
       } else {
         _spinner.hideSpinner();
         emailVerificationPopUp();
+        await _auth.currentUser!.sendEmailVerification();
+        _auth.signOut();
       }
     } on Exception catch (e) {
       _spinner.hideSpinner();
@@ -128,6 +131,14 @@ class AuthService {
     } catch (e) {
       print('Error checking document existence: $e');
       return false;
+    }
+  }
+
+  Future<void> resetPassword({required String userEmail}) async {
+    try{
+      await _auth.sendPasswordResetEmail(email: userEmail);
+    } catch (e) {
+      print(e);
     }
   }
 

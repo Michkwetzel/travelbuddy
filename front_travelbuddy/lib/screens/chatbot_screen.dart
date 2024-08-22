@@ -149,7 +149,7 @@ class MessageBuble extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 10),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
+        crossAxisAlignment: sender == 'assistant' ? CrossAxisAlignment.start : CrossAxisAlignment.end,
         children: [
           Text(
             sender,
