@@ -1,13 +1,18 @@
 import 'dart:async';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:front_travelbuddy/change_notifiers/spinner.dart';
 import 'package:front_travelbuddy/change_notifiers/user_model.dart';
+import 'db_service.dart';
 
 class AuthService {
   final Spinner _spinner;
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore db = FirebaseFirestore.instance;
   StreamSubscription<User?>? _authStateSubscription; // ignore: unused_field
   UserModel _userModel;
+  final dbService = DbService();
+
   AuthService({required spinner, required userModel})
       // Sets up Auth + starts to listen for auth changes
       : _spinner = spinner,
@@ -37,25 +42,27 @@ class AuthService {
     );
   }
 
-  Future<UserCredential?> createUserWithEmailAndPassword({required String userEmail, required String userPassword, required Function nextScreenCall}) async {
-    final nextScreen = nextScreenCall;
-
+  Future<UserCredential?> createUserWithEmailAndPassword({
+    // Create user profile on google Auth. and sends vertification request. Does not yet create profile on DB
+    required String userEmail,
+    required String userPassword,
+    required Function() emailVerificationPopUp,
+  }) async {
+    dynamic newUserCred;
     try {
-      final newUserCred = await _auth.createUserWithEmailAndPassword(email: userEmail, password: userPassword);
-      final newUserUID = newUserCred.user?.uid;
-      await signInWithEmailAndPassword(userEmail, userPassword, nextScreen);
-      print(newUserUID);
+      newUserCred = await _auth.createUserWithEmailAndPassword(email: userEmail, password: userPassword);
+      _auth.currentUser?.sendEmailVerification();
+      emailVerificationPopUp();
+      await _auth.signOut();
       return newUserCred;
     } catch (e) {
-      print(e);
+      print('error: $e');
       return null;
     }
   }
 
-  Future<UserCredential?> signInWithGoogle(Function nextScreenCall) async {
-    final nextScreen = nextScreenCall;
-
-    // Set up Google sing in and add scopes for email and profile information
+  Future<UserCredential?> signInWithGoogle({Function? nextScreenCall}) async {
+    // Signs in with google and sends request to backend to create user profile if 1st time SignIn.
     GoogleAuthProvider googleProvider = GoogleAuthProvider();
     googleProvider.addScope('https://www.googleapis.com/auth/userinfo.email');
     googleProvider.addScope('https://www.googleapis.com/auth/userinfo.profile');
@@ -64,28 +71,63 @@ class AuthService {
     try {
       _auth.signOut();
       var userCred = await _auth.signInWithPopup(googleProvider);
-      nextScreen();
+
+      if (userCred.additionalUserInfo!.isNewUser) {
+        _spinner.showSpinner();
+        await dbService.addNewUser(userCred: userCred);
+        _spinner.hideSpinner();
+      }
+
+      // Log in succesfull and create new user succesfull
+      nextScreenCall?.call();
       return userCred;
     } on Exception catch (e) {
+      _spinner.hideSpinner();
       print('error: $e');
       return null;
     }
   }
 
-  Future<UserCredential?> signInWithEmailAndPassword(String userEmail, String userPassword, Function nextScreenCall) async {
-    final nextScreen = nextScreenCall;
+  Future<void> signInWithEmailAndPassword({
+    required String userEmail,
+    required String userPassword,
+    required Function() emailVerificationPopUp,
+    Function? nextScreenCall,
+  }) async {
+    // Checks if user email is verified. Also checks if user profile exists on DB.
+    //if not, sends request to backend to add new user. This is for first time sign in.
 
     try {
       _spinner.showSpinner();
       var userCred = await _auth.signInWithEmailAndPassword(email: userEmail, password: userPassword);
-      _spinner.hideSpinner();
-      nextScreen();
-      return userCred;
+      bool emailVerified = userCred.user!.emailVerified;
+
+      if (emailVerified) {
+        if (await doesUserProfileExist(userCred.user!.uid)) {
+          _spinner.hideSpinner();
+          nextScreenCall?.call();
+        } else {
+          await dbService.addNewUser(userCred: userCred);
+          _spinner.hideSpinner();
+          nextScreenCall?.call();
+        }
+      } else {
+        _spinner.hideSpinner();
+        emailVerificationPopUp();
+      }
     } on Exception catch (e) {
       _spinner.hideSpinner();
       print(e);
+    }
+  }
 
-      return null;
+  Future<bool> doesUserProfileExist(String userUID) async {
+    try {
+      final docSnapshot = await FirebaseFirestore.instance.collection('users').doc(userUID).get();
+      return docSnapshot.exists;
+    } catch (e) {
+      print('Error checking document existence: $e');
+      return false;
     }
   }
 

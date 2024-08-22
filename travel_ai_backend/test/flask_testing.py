@@ -1,8 +1,12 @@
 import json
 from flask_server_code import app
-import datetime
-time_stamp = datetime.datetime.now()
-print(time_stamp)
+
+from services.firestore_service import FirestoreService
+
+firestore = FirestoreService()
+
+firestore.add_new_user('12123', 'qwert@gmail.com', 'michael')
+
 #
 # # Create a test client
 # with app.test_client() as client:
@@ -20,4 +24,4 @@ print(time_stamp)
 #     # Assert the response status code and content
 #     assert response.status_code == 200
 #     print(response.get_data())
-
+#

@@ -14,10 +14,11 @@ class HttpService {
     try {
       print('uri: $uri');
       print('request: $request');
-      print('headers: $headers');
       final response = await http.post(uri, body: jsonEncode(request), headers: headers);
+      print('post requst done');
 
       if (response.statusCode == 200) {
+        print('Response status code: 200');
         return response.body;
       } else {
         throw HttpException('Request failed with status: ${response.statusCode}');

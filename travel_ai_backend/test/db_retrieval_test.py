@@ -15,4 +15,7 @@ uid = "yr2783ghfehide"
 
 #print(firestore.get_doc(doc_path='users/6A1fdmwR5mKjrCEcQ7ZB/chats/Chat1/messages', doc_id='2024-07-31-10-49-50'))
 print(firestore.add_doc(doc_path='users/6A1fdmwR5mKjrCEcQ7ZB/chats/Chat1/messages', doc_id='2024-07-31-10-49-55', fields_dict={'hi': 'hi'}))
+
+firestore.add_doc(doc_path='users')
+
 #firestore.get_message()
