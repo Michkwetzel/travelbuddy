@@ -17,7 +17,7 @@ class MessagingService {
     String userID = userModel.currentUser;
     print('Send message called for user $userID');
     //String userID = '6A1fdmwR5mKjrCEcQ7ZB';
-    String chatRoomID = 'Chat1';
+    String chatRoomID = '1';
     
     Map<String, dynamic> request = {
       'userID': userID,
@@ -40,7 +40,7 @@ Stream<QuerySnapshot<Map<String, dynamic>>> getMessageStream({required String ch
     String userID = userModel.currentUser;
     print("Get stream called for user $userID");
     //String userID = '6A1fdmwR5mKjrCEcQ7ZB';
-    String chatRoomID = 'Chat1';
+    String chatRoomID = '1';
     String docPath = 'users/$userID/chats/$chatRoomID/messages';
     
     var stream = db.collection(docPath).snapshots();

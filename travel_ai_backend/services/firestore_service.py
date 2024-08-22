@@ -1,6 +1,8 @@
 import firebase_admin
 import time
+import datetime
 from firebase_admin import credentials, firestore
+
 
 # Firebase initialization (ideally, do this once in your app's entry point)
 cred = credentials.Certificate(
@@ -11,6 +13,42 @@ firebase_admin.initialize_app(cred)
 class FirestoreService:
     def __init__(self):
         self.db = firestore.client()
+
+    def add_new_user(self, user_uid: str, user_email, display_name, tt_member=False):
+
+        if self.db.collection('new_tt_members').document(user_email).get().to_dict():
+            # New Travel Tribe paying member. Add paid flag to dB
+            print('Paying travel tribe member')
+            tt_member = True
+
+        user_doc_ref = self.db.collection('users').document(user_uid)
+        user_doc_ref.set({
+            'display_name': display_name,
+            'email': user_email,
+            'tt_member': tt_member
+        }, merge=True)  # Merge to avoid overwriting existing data
+
+        chats_collection = user_doc_ref.collection('chats')
+        chatroom_doc_ref = chats_collection.document('1')
+        chatroom_doc_ref.set({
+            'description': 'First chatroom!'
+        })
+
+        messages_collection = chatroom_doc_ref.collection('messages')
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
+        message_doc_ref = messages_collection.document(timestamp)
+        message_doc_ref.set({
+            'message': 'Hi and Welcome to Travel Buddy! Here you can ask away any question.'
+                       'Go on, ask me any nagging travel question!',
+            'role': 'assistant'
+        })
+
+        # Move user from new_tt_member to active_tt_member
+        #TODO: Add user info like Date joined etc.
+        if tt_member:
+            self.db.collection('active_tt_members').document(user_email).set({'email': user_email, 'display_name': display_name})
+            self.db.collection('new_tt_members').document(user_email).delete()
+
 
     def add_doc(self, doc_path: str, fields_dict: dict, doc_id: str = None) -> str:
         """
@@ -39,14 +77,9 @@ class FirestoreService:
 
     def get_doc(self, doc_path: str, doc_id: str) -> dict:
         """Gets a single document by its ID."""
-        start_time = time.time()
 
         #doc = self.db.document(f'{doc_path}/{doc_id}').get()
         doc = self.db.collection(doc_path).document(doc_id).get()
-
-        end_time = time.time()
-        elapsed_time = end_time - start_time
-        print(f"Get Doc Execution time: {elapsed_time} seconds")
 
         return doc.to_dict() if doc.exists else {}
 

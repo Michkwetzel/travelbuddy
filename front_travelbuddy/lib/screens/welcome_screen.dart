@@ -15,10 +15,11 @@ class WelcomeScreen extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 30),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+          crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Center(child: Text("Welcome to Travel Buddy", style: TextStyle(fontSize: 25))),
+            Center(child: Text("The world is a beautifull place", style: TextStyle(fontSize: 25))),
+            Text('Lets learn about it'),
             SizedBox(
               height: 30,
             ),
@@ -32,7 +33,7 @@ class WelcomeScreen extends StatelessWidget {
             ElevatedButton(
               style: ButtonStyle(),
               onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => RegisterScreen())),
-              child: Text("Register"),
+              child: Text("Sign up"),
             ),
             ElevatedButton(
               onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ChatbotScreen())),
