@@ -73,7 +73,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     await Provider.of<AuthService>(context, listen: false).createUserWithEmailAndPassword(
                       userEmail: userEmail,
                       userPassword: userPassword,
-                      emailVerificationPopUp: () => widgetDialogBuilder(context),
+                      emailVerificationPopUp: () => emailVertificationDialog(context, 'A verification link has been sent to your email.\nPlease verify your account and log in.'),
                     );
                   },
                   child: Text("Create new Account"),
@@ -89,7 +89,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    widgetDialogBuilder(context);
+                    emailVertificationDialog(context, 'A verification link has been sent to your email.\nPlease verify your account and log in.');
                   },
                   child: Text("PopUp screen"),
                 )

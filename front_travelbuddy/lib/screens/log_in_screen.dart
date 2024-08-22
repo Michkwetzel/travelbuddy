@@ -26,6 +26,13 @@ class _LogInScreenState extends State<LogInScreen> {
     //provide spinner callback to authService
 
     return Scaffold(
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => passwordResetDialog(
+          context,
+          (email) => Provider.of<AuthService>(context, listen: false).resetPassword(userEmail: email),
+        ),
+        label: Text("Reset Password"),
+      ),
       body: ModalProgressHUD(
         inAsyncCall: Provider.of<Spinner>(context).spinner,
         child: Padding(
@@ -75,11 +82,14 @@ class _LogInScreenState extends State<LogInScreen> {
                     await Provider.of<AuthService>(context, listen: false).signInWithEmailAndPassword(
                       userEmail: userEmail,
                       userPassword: userPassword,
-                      emailVerificationPopUp: () => widgetDialogBuilder(context),
+                      emailVerificationPopUp: () => emailVertificationDialog(context, 'Another verification link has been sent to your email.\nPlease verify your account and log in.'),
                       nextScreenCall: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ChatbotScreen())),
                     );
                   },
                   child: Text("Log in"),
+                ),
+                SizedBox(
+                  width: 20,
                 ),
                 LineBreak(),
                 GoogleSignInButton(
