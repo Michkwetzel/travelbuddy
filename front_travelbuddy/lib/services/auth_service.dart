@@ -1,22 +1,24 @@
 import 'dart:async';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:front_travelbuddy/change_notifiers/spinner.dart';
 import 'package:front_travelbuddy/change_notifiers/user_model.dart';
-import 'db_service.dart';
+import 'back_end_service.dart';
+import 'package:front_travelbuddy/services/firestore_service.dart';
+import 'package:front_travelbuddy/change_notifiers/fire_base_stream_provider.dart';
 
 class AuthService {
-  final Spinner _spinner;
+  //For accessing firebaseAuth
+  final Spinner spinner;
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore db = FirebaseFirestore.instance;
   StreamSubscription<User?>? _authStateSubscription; // ignore: unused_field
   UserModel _userModel;
-  final dbService = DbService();
+  BackEndService backEndService;
+  FireStoreService fireStoreService;
+  FireStoreStreamProvider fireStoreStreamProvider;
 
-  AuthService({required spinner, required userModel})
+  AuthService({required this.spinner, required this.backEndService, required userModel, required this.fireStoreService, required this.fireStoreStreamProvider})
       // Sets up Auth + starts to listen for auth changes
-      : _spinner = spinner,
-        _userModel = userModel {
+      : _userModel = userModel {
     _listenForAuthChanges();
   }
 
@@ -33,6 +35,7 @@ class AuthService {
           print('No user signed in!');
         } else {
           _userModel.setUser(user.uid);
+          fireStoreStreamProvider.updateStreams();
           final userUID = user.uid;
           print('UserUID: $userUID');
           print('User is signed in!');
@@ -74,16 +77,16 @@ class AuthService {
       var userCred = await _auth.signInWithPopup(googleProvider);
 
       if (userCred.additionalUserInfo!.isNewUser) {
-        _spinner.showSpinner();
-        await dbService.addNewUser(userCred: userCred);
-        _spinner.hideSpinner();
+        spinner.showSpinner();
+        await backEndService.addNewUser(userCred: userCred);
+        spinner.hideSpinner();
       }
 
       // Log in succesfull and create new user succesfull
       nextScreenCall?.call();
       return userCred;
     } on Exception catch (e) {
-      _spinner.hideSpinner();
+      spinner.hideSpinner();
       print('error: $e');
       return null;
     }
@@ -99,43 +102,34 @@ class AuthService {
     //if not, sends request to backend to add new user. This is for first time sign in.
 
     try {
-      _spinner.showSpinner();
+      spinner.showSpinner();
       var userCred = await _auth.signInWithEmailAndPassword(email: userEmail, password: userPassword);
       bool emailVerified = userCred.user!.emailVerified;
 
       if (emailVerified) {
-        if (await doesUserProfileExist(userCred.user!.uid)) {
-          _spinner.hideSpinner();
+        if (await fireStoreService.doesUserProfileExist(userCred.user!.uid)) {
+          print('Checked if user profile exists');
+          spinner.hideSpinner();
           nextScreenCall?.call();
         } else {
-          await dbService.addNewUser(userCred: userCred);
-          _spinner.hideSpinner();
+          await backEndService.addNewUser(userCred: userCred);
+          spinner.hideSpinner();
           nextScreenCall?.call();
         }
       } else {
-        _spinner.hideSpinner();
+        spinner.hideSpinner();
         emailVerificationPopUp();
         await _auth.currentUser!.sendEmailVerification();
         _auth.signOut();
       }
     } on Exception catch (e) {
-      _spinner.hideSpinner();
+      spinner.hideSpinner();
       print(e);
     }
   }
 
-  Future<bool> doesUserProfileExist(String userUID) async {
-    try {
-      final docSnapshot = await FirebaseFirestore.instance.collection('users').doc(userUID).get();
-      return docSnapshot.exists;
-    } catch (e) {
-      print('Error checking document existence: $e');
-      return false;
-    }
-  }
-
   Future<void> resetPassword({required String userEmail}) async {
-    try{
+    try {
       await _auth.sendPasswordResetEmail(email: userEmail);
     } catch (e) {
       print(e);

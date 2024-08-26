@@ -4,10 +4,8 @@ import 'package:provider/provider.dart';
 import 'package:front_travelbuddy/screens/chatbot_screen.dart';
 import 'package:front_travelbuddy/services/auth_service.dart';
 import 'package:front_travelbuddy/change_notifiers/spinner.dart';
-import 'package:front_travelbuddy/change_notifiers/user_model.dart';
 import 'package:front_travelbuddy/services/http_service.dart';
 import 'package:front_travelbuddy/widgets/widgets.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class LogInScreen extends StatefulWidget {
   const LogInScreen({super.key});

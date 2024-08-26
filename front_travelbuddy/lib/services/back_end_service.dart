@@ -1,7 +1,13 @@
+import 'package:front_travelbuddy/change_notifiers/user_model.dart';
 import 'package:front_travelbuddy/services/http_service.dart';
 
-class DbService {
-  final http = HttpService();
+class BackEndService {
+
+  //Works with http service. For database operations
+  final HttpService http;
+  UserModel userModel;
+
+  BackEndService({required this.userModel, required this.http});
 
   /// send DB write request to backend. Must include collection and data.
   /// if docID empty then google will assign doc random docID
@@ -37,5 +43,24 @@ class DbService {
 
     final response = await http.postRequest(path: path, request: profileData);
     return response;
+  }
+
+  Future<String> sendMessage({required String chatRoomID, required String userMessage}) async {
+    try {
+      String timestamp = DateTime.now().toString();
+      String userID = userModel.currentUser;
+      print('Send message called for user $userID');
+      //String userID = '6A1fdmwR5mKjrCEcQ7ZB';
+      String chatRoomID = '1';
+
+      Map<String, dynamic> request = {'userID': userID, 'chatID': chatRoomID, 'message': userMessage, 'timestamp': timestamp};
+
+      var response = await http.postRequest(path: '/receive_user_massage', request: request);
+      print('Message sent and response received: $response');
+      return response;
+    } catch (e) {
+      print('Error sending message: $e');
+      return 'Error: $e';
+    }
   }
 }
