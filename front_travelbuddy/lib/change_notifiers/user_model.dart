@@ -22,7 +22,6 @@ class UserModel extends ChangeNotifier {
 
   void setUser(String currentUser) {
     _userUID = currentUser;
-
     notifyListeners();
   }
 }
