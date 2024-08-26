@@ -35,10 +35,8 @@ class AuthService {
           print('No user signed in!');
         } else {
           _userModel.setUser(user.uid);
-          fireStoreStreamProvider.updateStreams();
           final userUID = user.uid;
-          print('UserUID: $userUID');
-          print('User is signed in!');
+          print('User Change signalled - UserUID: $userUID');
           // Additional actions for sign-in (e.g., fetch user profile)
         }
       },
@@ -73,10 +71,10 @@ class AuthService {
 
     try {
       _auth.signOut();
-      print("Is new user");
       var userCred = await _auth.signInWithPopup(googleProvider);
 
       if (userCred.additionalUserInfo!.isNewUser) {
+        print("Is new user");
         spinner.showSpinner();
         await backEndService.addNewUser(userCred: userCred);
         spinner.hideSpinner();

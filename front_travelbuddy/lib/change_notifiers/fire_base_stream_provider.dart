@@ -13,7 +13,14 @@ class FireStoreStreamProvider with ChangeNotifier {
   UserModel userModel;
   FireStoreService fireStoreService;
 
-  FireStoreStreamProvider({required this.userModel, required this.fireStoreService});
+  FireStoreStreamProvider({required this.userModel, required this.fireStoreService}) {
+    userModel.addListener(_onUserChange);
+  }
+
+  void _onUserChange() {
+    _messageStream = fireStoreService.getMessageStream(chatRoomID: '1');
+    _chatRoomStream = fireStoreService.getChatroomStream();
+  }
 
   void initializeMessageStream(String chatRoomID) {
     print('Message stream initialized');
@@ -24,7 +31,7 @@ class FireStoreStreamProvider with ChangeNotifier {
     _chatRoomStream = fireStoreService.getChatroomStream();
   }
 
-  void updateStreams(){
+  void updateStreams() {
     String currentUser = userModel.currentUser;
     print('update stream for user: $currentUser');
     initializeChatRoomStream();

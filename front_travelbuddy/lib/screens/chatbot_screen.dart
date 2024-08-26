@@ -16,7 +16,6 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
   bool isDrawerOpen = false;
   String userMessage = '';
   final messageTextController = TextEditingController();
-  late UserModel userModel;
   late BackEndService backEndService;
   late FireStoreStreamProvider streamProvider;
 
@@ -28,12 +27,8 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
 
   @override
   Widget build(BuildContext context) {
-    userModel = Provider.of<UserModel>(context);
-    backEndService = Provider.of<BackEndService>(context);
-    streamProvider = Provider.of<FireStoreStreamProvider>(context, listen: false);
-    streamProvider.initializeMessageStream('1');
-    streamProvider.initializeChatRoomStream();
-
+    backEndService = Provider.of<BackEndService>(context, listen: false);
+    streamProvider = Provider.of<FireStoreStreamProvider>(context);
   
     return Scaffold(
       appBar: AppBar(
