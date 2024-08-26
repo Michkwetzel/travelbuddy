@@ -108,6 +108,8 @@ def receive_user_message():
         message_collection_path = f'users/{user_id}/chats/{chat_id}/messages'
         response = firestore.add_doc(doc_path=message_collection_path, doc_id=timestamp, fields_dict=user_message_entry)
 
+        message += "**Note** Before this sentance is what the user requested. Note you are a travel agent so act in a travel agent way. expect the user to ask travel questions"
+
         llm_response = chat_bot.send_Request(message)
         llm_message_entry = {
              'message': llm_response,

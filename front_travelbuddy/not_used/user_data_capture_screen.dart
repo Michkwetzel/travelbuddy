@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'user_data_capture_notifier.dart';
 import 'package:front_travelbuddy/change_notifiers/user_model.dart';
-import 'package:front_travelbuddy/services/db_service.dart';
+import 'package:front_travelbuddy/services/back_end_service.dart';
 
 class UserDataCaptureScreen extends StatefulWidget {
   const UserDataCaptureScreen({super.key});
@@ -13,7 +13,7 @@ class UserDataCaptureScreen extends StatefulWidget {
 
 class _UserDataCaptureScreenState extends State<UserDataCaptureScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _dbService = DbService();
+  //final _dbService = BackEndService();
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +28,7 @@ class _UserDataCaptureScreenState extends State<UserDataCaptureScreen> {
             // If the validation rules passed
             _formKey.currentState!.save(); // Save the current state of the text fields
             final userData = userDataNotifier.userData;
-            print(await _dbService.writeToDB(collection: 'users',data:  userData.toMap(), docId: signedInUser.currentUser));
+            //print(await _dbService.writeToDB(collection: 'users',data:  userData.toMap(), docId: signedInUser.currentUser));
           }
         },
         backgroundColor: Colors.white,

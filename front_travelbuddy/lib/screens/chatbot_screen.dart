@@ -1,8 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:front_travelbuddy/change_notifiers/fire_base_stream_provider.dart';
+import 'package:front_travelbuddy/services/back_end_service.dart';
 import 'package:provider/provider.dart';
 import 'package:front_travelbuddy/change_notifiers/user_model.dart';
-import 'package:front_travelbuddy/services/messaging_service.dart';
 
 class ChatbotScreen extends StatefulWidget {
   const ChatbotScreen({super.key});
@@ -16,7 +17,8 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
   String userMessage = '';
   final messageTextController = TextEditingController();
   late UserModel userModel;
-  late MessagingService messageService;
+  late BackEndService backEndService;
+  late FireStoreStreamProvider streamProvider;
 
   void toggleDrawer() {
     setState(() {
@@ -27,8 +29,12 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
   @override
   Widget build(BuildContext context) {
     userModel = Provider.of<UserModel>(context);
-    messageService = MessagingService(userModel: userModel);
+    backEndService = Provider.of<BackEndService>(context);
+    streamProvider = Provider.of<FireStoreStreamProvider>(context, listen: false);
+    streamProvider.initializeMessageStream('1');
+    streamProvider.initializeChatRoomStream();
 
+  
     return Scaffold(
       appBar: AppBar(
         title: Text("Travel Buddy"),
@@ -43,11 +49,40 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
             duration: Duration(milliseconds: 700),
             curve: Curves.easeInOut,
             width: isDrawerOpen ? 250.0 : 0.0,
-            child: ListView(
+            child: Column(
               children: [
-                ListTile(title: Text("Chat 1", softWrap: false)),
-                ListTile(title: Text("Chat 2", softWrap: false)),
-                ListTile(title: Text("Chat 3", softWrap: false)),
+                TextButton(
+                    onPressed: () {},
+                    child: Text(
+                      'Create new chat',
+                      softWrap: false,
+                    )),
+                Flexible(
+                  child: StreamBuilder (
+                      stream: streamProvider.chatRoomStream,
+                      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                        if (snapshot.hasError) {
+                          return const Text('Something went wrong');
+                        }
+
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return const Text("Loading");
+                        } else {
+                          List<TextButton> chatTiles = [];
+                          final chats = snapshot.data!.docs;
+                          for (var chat in chats) {
+                            // Maybe here is overkill in code
+                            Map<String, dynamic> data = chat.data() as Map<String, dynamic>;
+                            String chatID = chat.id;
+                            String chatDescription = data['description'];
+                            chatTiles.add(TextButton(onPressed: () {} ,iconAlignment: IconAlignment.end ,child: Text('$chatID. $chatDescription', softWrap: false, textAlign: TextAlign.left,)));
+                          }
+                          return ListView(
+                            children: chatTiles,
+                          );
+                        }
+                      }),
+                ),
               ],
             ),
           ),
@@ -56,13 +91,8 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
               //Main Chat Tab
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                TextButton(
-                    onPressed: () {
-                      print(messageService.getMessageStream(chatRoomID: '1'));
-                    },
-                    child: Text("Get Stream")),
                 StreamBuilder(
-                    stream: messageService.getMessageStream(chatRoomID: '1'),
+                    stream: streamProvider.messageStream,
                     builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
                       if (snapshot.hasError) {
                         return const Text('Something went wrong');
@@ -115,7 +145,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
                             onPressed: () {
                               messageTextController.clear();
                               try {
-                                messageService.sendMessage(chatRoomID: 'Chat1', userMessage: userMessage);
+                                backEndService.sendMessage(chatRoomID: 'Chat1', userMessage: userMessage);
                               } catch (e) {
                                 print(e);
                               }
