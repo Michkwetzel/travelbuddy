@@ -1,19 +1,14 @@
 import 'package:flutter/material.dart';
-import 'fire_base_stream_provider.dart';
 
 class UserModel extends ChangeNotifier {
-  String _userUID = "";
+  String _userID = 'none';
 
   String get currentUser {
-    if (_userUID == 'none') {
-      return 'No user signed in ';
-    } else {
-      return _userUID;
-    }
+    return _userID;
   }
 
   bool signedIn(){
-    if (_userUID == 'none') {
+    if (_userID == 'none') {
       return false;
     } else {
       return true;
@@ -21,7 +16,7 @@ class UserModel extends ChangeNotifier {
   }
 
   void setUser(String currentUser) {
-    _userUID = currentUser;
+    _userID = currentUser;
     notifyListeners();
   }
 }

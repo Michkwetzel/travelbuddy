@@ -35,7 +35,7 @@ class FirestoreService:
         })
 
         messages_collection = chatroom_doc_ref.collection('messages')
-        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d,%H:%M:%S.%f")[:-3]
         message_doc_ref = messages_collection.document(timestamp)
         message_doc_ref.set({
             'message': 'Hi and Welcome to Travel Buddy! Here you can ask away any question.'
@@ -49,8 +49,32 @@ class FirestoreService:
             self.db.collection('active_tt_members').document(user_email).set({'email': user_email, 'display_name': display_name})
             self.db.collection('new_tt_members').document(user_email).delete()
 
+    def create_new_chatroom(self, user_id: str):
+        timestamp = datetime.datetime.now()
 
-    def add_doc(self, doc_path: str, fields_dict: dict, doc_id: str = None) -> str:
+        user_doc_ref = self.db.collection(f'users/{user_id}/chats').document()
+        user_doc_ref.set({
+            'description': 'New chatroom',
+            'timestamp_created': timestamp,
+            'timestamp_last_message': timestamp
+        }, merge=True)
+
+        message_doc_ref = user_doc_ref.collection('messages').document()
+        message_doc_ref.set({
+            'message' : 'Where are we traveling to today?',
+            'role': 'assistant',
+            'timestamp': timestamp
+        }, merge=True)
+
+        return user_doc_ref.id
+
+    def update_chatroom_latest_timestamp(self, user_id: str, chat_id: str, timestamp):
+        doc_ref = self.db.collection(f'users/{user_id}/chats').document(chat_id)
+        doc_ref.update({'timestamp_last_message': timestamp})
+        print(f"Chatroom: users/{user_id}/chats/{doc_ref.id} updated with, timestamp_last_message': {timestamp}")
+        return 'Success'
+
+    def add_doc(self, doc_path: str, fields_dict: dict, doc_id = None) -> str:
         """
         Adds a document to the specified collection.
         If no doc_id given then google automatically assigns random
