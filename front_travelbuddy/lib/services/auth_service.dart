@@ -11,14 +11,13 @@ class AuthService {
   final Spinner spinner;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   StreamSubscription<User?>? _authStateSubscription; // ignore: unused_field
-  UserModel _userModel;
+  UserModel userModel;
   BackEndService backEndService;
   FireStoreService fireStoreService;
   FireStoreStreamProvider fireStoreStreamProvider;
 
-  AuthService({required this.spinner, required this.backEndService, required userModel, required this.fireStoreService, required this.fireStoreStreamProvider})
-      // Sets up Auth + starts to listen for auth changes
-      : _userModel = userModel {
+  AuthService({required this.spinner, required this.backEndService, required this.userModel, required this.fireStoreService, required this.fireStoreStreamProvider}) {
+    // Sets up Auth + starts to listen for auth changes
     _listenForAuthChanges();
   }
 
@@ -31,12 +30,13 @@ class AuthService {
     _authStateSubscription = _auth.authStateChanges().listen(
       (User? user) {
         if (user == null) {
-          _userModel.setUser('none');
+          userModel.setUser('none');
           print('No user signed in!');
         } else {
-          _userModel.setUser(user.uid);
-          final userUID = user.uid;
-          print('User Change signalled - UserUID: $userUID');
+          userModel.setUser(user.uid);
+          fireStoreService.getLatestChatroom();
+          final userID = user.uid;
+          print('User Change signalled - UserID: $userID');
           // Additional actions for sign-in (e.g., fetch user profile)
         }
       },
@@ -77,8 +77,9 @@ class AuthService {
         print("Is new user");
         spinner.showSpinner();
         await backEndService.addNewUser(userCred: userCred);
+
         spinner.hideSpinner();
-      }
+      } else {}
 
       // Log in succesfull and create new user succesfull
       nextScreenCall?.call();

@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 
+import concurrent.futures
 import sys
 import os
 import datetime
@@ -70,14 +71,27 @@ def create_new_user_profile():
     try:
         request_body = request.get_json()
         user_email = request_body.get('userEmail')
-        user_uid = request_body.get('userUID')
+        user_id = request_body.get('userID')
         display_name = request_body.get('displayName')
 
-        firestore.add_new_user(user_uid=user_uid, user_email=user_email, display_name=display_name)
+        firestore.add_new_user(user_uid=user_id, user_email=user_email, display_name=display_name)
 
         return jsonify({"status": "success", "message": "User was added to database"})
     except Exception as e:
         return jsonify({"status": "error", "message": "An error occurred"})  # Internal Server Error
+
+
+@app.route('/create_new_chatroom', methods=['POST'])
+def create_new_chatroom():
+    try:
+        request_body = request.get_json()
+        user_id = request_body.get('userID')
+
+        chat_id = firestore.create_new_chatroom(user_id=user_id)
+        return jsonify({"chat_id": chat_id, "message": "Chatroom was added to database"})
+
+    except Exception as e:
+        return jsonify({f'message": "An error occurred {e}'})  # Internal Server Error
 
 
 @app.route('/receive_user_massage', methods=['POST'])
@@ -91,35 +105,42 @@ def receive_user_message():
         request_body = request.get_json()
 
         # Checks if all fields present
-        all_fields_present, missing_fields = check_required_fields(request_body, ['userID', 'chatID', 'message', 'timestamp'])
+        #all_fields_present, missing_fields = check_required_fields(request_body, ['userID', 'chatID', 'message'])
 
-        if not all_fields_present:
-            print("Error, Missing fields: " + missing_fields)
-            return jsonify({"status": "error", "message": f'Missing fields: " + {missing_fields}'})
+        # if not all_fields_present:
+        #     print("Error, Missing fields: " + missing_fields)
+        #     return jsonify({"status": "error", "message": f'Missing fields: " + {missing_fields}'})
 
         user_id = request_body.get('userID')
         chat_id = request_body.get('chatID')
         message = request_body.get('message')
-        timestamp = request_body.get('timestamp')
+        timestamp = datetime.datetime.now()
 
-        user_message_entry = {'message': message, 'role': 'user'}
+        user_message_entry = {'message': message, 'role': 'user', 'timestamp': timestamp}
 
         # Save user message to cloud DB
         message_collection_path = f'users/{user_id}/chats/{chat_id}/messages'
-        response = firestore.add_doc(doc_path=message_collection_path, doc_id=timestamp, fields_dict=user_message_entry)
+        response = firestore.add_doc(doc_path=message_collection_path, fields_dict=user_message_entry)
+        print(f'message recieved. path: {message_collection_path}, message_fields: {user_message_entry} doc_ID: {response}')
+
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            future = executor.submit(firestore.update_chatroom_latest_timestamp, user_id=user_id, chat_id=chat_id, timestamp=timestamp)
+            print(future.result())
+            print(f'Latest chatroom timestamp updated: chatroom: {chat_id}, timestamp: {timestamp}')
 
         message += "**Note** Before this sentance is what the user requested. Note you are a travel agent so act in a travel agent way. expect the user to ask travel questions"
 
         llm_response = chat_bot.send_Request(message)
+        timestamp = datetime.datetime.now()
         llm_message_entry = {
              'message': llm_response,
-             'role': 'assistant'
+             'role': 'assistant',
+             'timestamp': timestamp
         }
         print(llm_message_entry)
 
-        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
         # Save LLM response to cloud DB
-        firestore.add_doc(doc_path=message_collection_path, doc_id=timestamp, fields_dict=llm_message_entry)
+        firestore.add_doc(doc_path=message_collection_path, fields_dict=llm_message_entry)
         return jsonify({"status": "success", "message": "Message added to database"})
     except Exception as e:
         print(f"Unexpected error: {e}")

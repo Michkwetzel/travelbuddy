@@ -12,36 +12,39 @@ class WelcomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 30),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Center(child: Text("The world is a beautifull place", style: TextStyle(fontSize: 25))),
-            Text('Lets learn about it'),
-            SizedBox(
-              height: 30,
-            ),
-            ElevatedButton(
-              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => LogInScreen())),
-              child: Text("Log in"),
-            ),
-            SizedBox(
-              height: 5,
-            ),
-            ElevatedButton(
-              style: ButtonStyle(),
-              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => RegisterScreen())),
-              child: Text("Sign up"),
-            ),
-            ElevatedButton(
-              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ChatbotScreen())),
-              child: Text("ChatBot Screen"),
-            )
-          ],
+      body: Stack(children: [
+        Image.asset('assets/images/_4ed7e042-0cde-4836-bc0d-c155d0c50ba0.jpg', fit: BoxFit.cover),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 30),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Center(child: Text("The world is a beautifull place", style: TextStyle(fontSize: 25))),
+              Text('Lets learn about it'),
+              SizedBox(
+                height: 30,
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => LogInScreen())),
+                child: Text("Log in"),
+              ),
+              SizedBox(
+                height: 5,
+              ),
+              ElevatedButton(
+                style: ButtonStyle(),
+                onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => RegisterScreen())),
+                child: Text("Sign up"),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ChatbotScreen())),
+                child: Text("ChatBot Screen"),
+              )
+            ],
+          ),
         ),
-      ),
+      ]),
     );
   }
 }
