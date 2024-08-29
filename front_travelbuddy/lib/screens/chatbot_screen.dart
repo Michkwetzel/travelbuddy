@@ -57,7 +57,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> with SingleTickerProvider
       appBar: AppBar(
           title: Text("Travel Buddy"),
           leading: IconButton(
-            icon: AnimatedIcon(icon: AnimatedIcons.menu_close, progress: drawerController),
+            icon: Icon(Icons.menu),
             onPressed: toggleDrawer,
           )),
       body: ModalProgressHUD(
@@ -65,16 +65,14 @@ class _ChatbotScreenState extends State<ChatbotScreen> with SingleTickerProvider
         child: Row(
           children: [
             ChatRoomDrawer(isDrawerOpen: isDrawerOpen, controller: drawerController, backEndService: backEndService, chatStateProvider: chatStateProvider, streamProvider: streamProvider),
+            SizedBox(
+              width: 150,
+            ),
             Expanded(
               child: Column(
                 //Main Chat Tab
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  TextButton(
-                      onPressed: () {
-                        streamProvider.updateChatRoomStream();
-                      },
-                      child: Text('Get latest chat')),
                   StreamBuilder(
                       stream: streamProvider.messageStream,
                       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -114,9 +112,6 @@ class _ChatbotScreenState extends State<ChatbotScreen> with SingleTickerProvider
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          SizedBox(
-                            width: 200,
-                          ),
                           Expanded(
                             child: TextField(
                               controller: messageTextController,
@@ -140,7 +135,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> with SingleTickerProvider
                                 }
                                 ;
                               },
-                              icon: Icon(Icons.send))
+                              icon: Icon(Icons.send)),
                         ],
                       ),
                     ),
@@ -150,6 +145,9 @@ class _ChatbotScreenState extends State<ChatbotScreen> with SingleTickerProvider
                   ])
                 ],
               ),
+            ),
+            SizedBox(
+              width: 50,
             ),
           ],
         ),
@@ -184,10 +182,8 @@ class ChatRoomDrawer extends StatelessWidget {
           color: Colors.blue[100],
           child: Column(
             children: [
-              DrawerItemBuilder(
+              NewChatButton(
                   controller: controller,
-                  icon: Icons.abc_rounded,
-                  text: "Create New Chat",
                   onTap: () async {
                     String chatRoomID = await backEndService.createNewChatroom();
                     chatStateProvider.setCurrentChatroom(chatRoomID);
@@ -221,17 +217,27 @@ class ChatRoomStreamBuilder extends StatelessWidget {
           stream: streamProvider.chatRoomStream,
           builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
             if (snapshot.hasError) {
-              return const Text('Something went wrong', softWrap: false, maxLines: 1,);
+              return const Text(
+                'Something went wrong',
+                softWrap: false,
+                maxLines: 1,
+              );
             } else if (snapshot.connectionState == ConnectionState.waiting || !snapshot.hasData || snapshot.data!.docs.isEmpty) {
-              return Text('Loading', softWrap: false, maxLines: 1,);
+              return Text(
+                'Loading',
+                softWrap: false,
+                maxLines: 1,
+              );
             } else {
-              List<DrawerItemBuilder> chatTiles = [];
+              List<ChatRoomButtonBuilder> chatTiles = [];
               final chats = snapshot.data!.docs;
               for (var chat in chats) {
                 // Maybe here is overkill in code
                 Map<String, dynamic> data = chat.data() as Map<String, dynamic>;
                 String chatDescription = data['description'];
-                chatTiles.add(DrawerItemBuilder(
+                chatTiles.add(ChatRoomButtonBuilder(
+                  onDelete: () {},
+                  onEditDescription: () {},
                   controller: controller,
                   icon: Icons.ac_unit,
                   text: chatDescription,
@@ -242,26 +248,17 @@ class ChatRoomStreamBuilder extends StatelessWidget {
                 ));
               }
               return ListView(children: chatTiles);
-              
             }
           }),
     );
   }
 }
 
-class DrawerItemBuilder extends StatelessWidget {
-  const DrawerItemBuilder({
-    super.key,
-    required this.controller,
-    required this.text,
-    required this.icon,
-    required this.onTap,
-  });
-
-  final AnimationController controller;
-  final String text;
-  final IconData icon;
+class NewChatButton extends StatelessWidget {
   final VoidCallback onTap;
+  final AnimationController controller;
+
+  const NewChatButton({super.key, required this.controller, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -269,23 +266,110 @@ class DrawerItemBuilder extends StatelessWidget {
       height: 50,
       child: ClipRect(
         child: AnimatedBuilder(
-          animation: controller,
+            animation: controller,
+            builder: (context, child) {
+              return Align(
+                child: TextButton.icon(
+                  icon: Icon(Icons.chat),
+                  label: Text(
+                    'New Chat',
+                    softWrap: false,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  ),
+                  onPressed: onTap,
+                  style: TextButton.styleFrom(
+                    alignment: Alignment.centerLeft,
+                    padding: const EdgeInsets.symmetric(horizontal: 30),
+                  ),
+                ),
+              );
+            }),
+      ),
+    );
+  }
+}
+
+class ChatRoomButtonBuilder extends StatefulWidget {
+  const ChatRoomButtonBuilder({
+    super.key,
+    required this.controller,
+    required this.text,
+    required this.icon,
+    required this.onTap,
+    required this.onDelete,
+    required this.onEditDescription,
+  });
+
+  final AnimationController controller;
+  final String text;
+  final IconData icon;
+  final VoidCallback onTap;
+  final VoidCallback onDelete;
+  final VoidCallback onEditDescription;
+
+  @override
+  State<ChatRoomButtonBuilder> createState() => _ChatRoomButtonBuilderState();
+}
+
+class _ChatRoomButtonBuilderState extends State<ChatRoomButtonBuilder> {
+  bool _isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 50,
+      child: ClipRect(
+        child: AnimatedBuilder(
+          animation: widget.controller,
           builder: (context, child) {
             return Align(
-              alignment: Alignment(-1.0 + controller.value, 0.0),
-              child: TextButton.icon(
-                icon: Icon(icon),
-                label: Text(
-                  text,
-                  softWrap: false,
-                  overflow: TextOverflow.clip,
-                  maxLines: 1,
-                ),
-                onPressed: onTap,
-                style: TextButton.styleFrom(
-                  alignment: Alignment.centerLeft,
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                ),
+              alignment: Alignment(-1.0, 0.0),
+              child: MouseRegion(
+                onEnter: (event) => setState(() => _isHovered = true),
+                onExit: (event) => setState(() => _isHovered = false),
+                child: Row(children: [
+                  Expanded(
+                    child: TextButton.icon(
+                      icon: Icon(widget.icon),
+                      label: Text(
+                        widget.text,
+                        softWrap: false,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
+                      onPressed: widget.onTap,
+                      style: TextButton.styleFrom(
+                        alignment: Alignment.centerLeft,
+                        padding: const EdgeInsets.only(right: 16, left: 10),
+                      ),
+                    ),
+                  ),
+                  if (_isHovered)
+                    Positioned(
+                      child: PopupMenuButton<String>(
+                        icon: Icon(
+                          Icons.more_vert,
+                          size: 20,
+                        ),
+                        itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                          const PopupMenuItem<String>(child: Text('Delete Chat'), value: 'delete'),
+                          const PopupMenuItem<String>(
+                            child: Text('Rename Chat'),
+                            value: 'rename',
+                          ),
+                        ],
+                        onSelected: (String value) {
+                          // Handle menu item selection
+                          if (value == 'rename') {
+                            // TODO: Implement rename functionality
+                          } else if (value == 'delete') {
+                            // TODO: Implement delete functionality
+                          }
+                        },
+                      ),
+                    )
+                ]),
               ),
             );
           },

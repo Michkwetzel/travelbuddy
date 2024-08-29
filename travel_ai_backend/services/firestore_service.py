@@ -21,6 +21,8 @@ class FirestoreService:
             print('Paying travel tribe member')
             tt_member = True
 
+        timestamp = datetime.datetime.now()
+
         user_doc_ref = self.db.collection('users').document(user_uid)
         user_doc_ref.set({
             'display_name': display_name,
@@ -29,18 +31,20 @@ class FirestoreService:
         }, merge=True)  # Merge to avoid overwriting existing data
 
         chats_collection = user_doc_ref.collection('chats')
-        chatroom_doc_ref = chats_collection.document('1')
+        chatroom_doc_ref = chats_collection.document()
         chatroom_doc_ref.set({
-            'description': 'First chatroom!'
+            'description': 'First chatroom!',
+            'timestamp_created': timestamp,
+            'timestamp_last_message': timestamp,
         })
 
         messages_collection = chatroom_doc_ref.collection('messages')
-        timestamp = datetime.datetime.now().strftime("%Y-%m-%d,%H:%M:%S.%f")[:-3]
-        message_doc_ref = messages_collection.document(timestamp)
+        message_doc_ref = messages_collection.document()
         message_doc_ref.set({
             'message': 'Hi and Welcome to Travel Buddy! Here you can ask away any question.'
                        'Go on, ask me any nagging travel question!',
-            'role': 'assistant'
+            'role': 'assistant',
+            'timestamp': timestamp
         })
 
         # Move user from new_tt_member to active_tt_member
@@ -49,24 +53,26 @@ class FirestoreService:
             self.db.collection('active_tt_members').document(user_email).set({'email': user_email, 'display_name': display_name})
             self.db.collection('new_tt_members').document(user_email).delete()
 
+        return chatroom_doc_ref.id
+
     def create_new_chatroom(self, user_id: str):
         timestamp = datetime.datetime.now()
 
-        user_doc_ref = self.db.collection(f'users/{user_id}/chats').document()
-        user_doc_ref.set({
+        chatroom_doc_ref = self.db.collection(f'users/{user_id}/chats').document()
+        chatroom_doc_ref.set({
             'description': 'New chatroom',
             'timestamp_created': timestamp,
             'timestamp_last_message': timestamp
         }, merge=True)
 
-        message_doc_ref = user_doc_ref.collection('messages').document()
+        message_doc_ref = chatroom_doc_ref.collection('messages').document()
         message_doc_ref.set({
             'message' : 'Where are we traveling to today?',
             'role': 'assistant',
             'timestamp': timestamp
         }, merge=True)
 
-        return user_doc_ref.id
+        return chatroom_doc_ref.id
 
     def update_chatroom_latest_timestamp(self, user_id: str, chat_id: str, timestamp):
         doc_ref = self.db.collection(f'users/{user_id}/chats').document(chat_id)

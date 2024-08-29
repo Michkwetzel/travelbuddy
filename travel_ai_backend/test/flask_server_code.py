@@ -67,18 +67,17 @@ def write_to_db():
 
 @app.route('/create_new_user_profile', methods=['POST'])
 def create_new_user_profile():
-
     try:
         request_body = request.get_json()
         user_email = request_body.get('userEmail')
         user_id = request_body.get('userID')
         display_name = request_body.get('displayName')
 
-        firestore.add_new_user(user_uid=user_id, user_email=user_email, display_name=display_name)
+        chat_id = firestore.add_new_user(user_uid=user_id, user_email=user_email, display_name=display_name)
+        return jsonify({"chat_id": chat_id, "message": "User was added to database"})
 
-        return jsonify({"status": "success", "message": "User was added to database"})
     except Exception as e:
-        return jsonify({"status": "error", "message": "An error occurred"})  # Internal Server Error
+        return jsonify({f'status": "error", "message": "An error occurred {e}'})  # Internal Server Error
 
 
 @app.route('/create_new_chatroom', methods=['POST'])
