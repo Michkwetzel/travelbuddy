@@ -13,7 +13,6 @@ class FireStoreStreamProvider with ChangeNotifier {
   FireStoreService fireStoreService;
 
   FireStoreStreamProvider({required this.userModel, required this.fireStoreService, required this.chatStateProvider}) {
-    userModel.addListener(_onUserChange);
     chatStateProvider.addListener(updateMessageStream);
   }
 
@@ -35,11 +34,6 @@ class FireStoreStreamProvider with ChangeNotifier {
     }
   }
 
-  void _onUserChange() {
-    _messageStream = fireStoreService.getMessageStream(chatRoomID: chatStateProvider.currentChat);
-    _chatRoomStream = fireStoreService.getChatroomStream();
-  }
-
   void updateMessageStream() {
     _messageStream = fireStoreService.getMessageStream(chatRoomID: chatStateProvider.currentChat);
     notifyListeners();
@@ -47,11 +41,12 @@ class FireStoreStreamProvider with ChangeNotifier {
 
   void updateChatRoomStream() {
     _chatRoomStream = fireStoreService.getChatroomStream();
+    notifyListeners();
   }
 
-  void updateAllStreams() {
+  void userChangeStreamUpdate() {
     updateChatRoomStream();
-    updateMessageStream();
+    fireStoreService.getLatestChatroom();
     notifyListeners();
   }
 }

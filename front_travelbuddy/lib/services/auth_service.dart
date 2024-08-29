@@ -70,7 +70,6 @@ class AuthService {
     googleProvider.setCustomParameters({'login_hint': 'user@example.com'});
 
     try {
-      _auth.signOut();
       var userCred = await _auth.signInWithPopup(googleProvider);
 
       if (userCred.additionalUserInfo!.isNewUser) {
@@ -82,6 +81,7 @@ class AuthService {
       } else {}
 
       // Log in succesfull and create new user succesfull
+      fireStoreStreamProvider.userChangeStreamUpdate();
       nextScreenCall?.call();
       return userCred;
     } on Exception catch (e) {
@@ -108,10 +108,12 @@ class AuthService {
       if (emailVerified) {
         if (await fireStoreService.doesUserProfileExist(userCred.user!.uid)) {
           print('Checked if user profile exists');
+          fireStoreStreamProvider.userChangeStreamUpdate();
           spinner.hideSpinner();
           nextScreenCall?.call();
         } else {
           await backEndService.addNewUser(userCred: userCred);
+          fireStoreStreamProvider.userChangeStreamUpdate();
           spinner.hideSpinner();
           nextScreenCall?.call();
         }
@@ -138,6 +140,7 @@ class AuthService {
   Future<void> signOut() async {
     try {
       await _auth.signOut();
+      fireStoreStreamProvider.userChangeStreamUpdate();
       print('signed out');
     } catch (e) {
       print(e);

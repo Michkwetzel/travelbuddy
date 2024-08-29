@@ -13,12 +13,12 @@ class FireStoreService {
   Stream<QuerySnapshot<Map<String, dynamic>>> getMessageStream({required String chatRoomID}) {
     try {
       String userID = userModel.currentUser;
+      print('Log: getMessageStream called: userID: $userID chatRoomID: $chatRoomID');
       if (chatRoomID == '' || userID == '' || userID == 'none' || chatRoomID == 'none') {
         return Stream<QuerySnapshot<Map<String, dynamic>>>.empty();
       }
 
       String docPath = 'users/$userID/chats/$chatRoomID/messages';
-      print('Attempting to get message stream for $docPath');
       var stream = db.collection(docPath).orderBy('timestamp', descending: true).snapshots();
 
       return stream;
@@ -32,10 +32,10 @@ class FireStoreService {
   Stream<QuerySnapshot<Map<String, dynamic>>> getChatroomStream() {
     try {
       String userID = userModel.currentUser;
+      print('Log: getChatroomStream called: userID: $userID');
       if (userID == '' || userID == 'none') {
         return Stream<QuerySnapshot<Map<String, dynamic>>>.empty();
       }
-      print('Attempting to get chatroom stream for $userID');
       var stream = db.collection('users/$userID/chats').orderBy('timestamp_last_message', descending: true).snapshots();
 
       return stream;
@@ -60,10 +60,12 @@ class FireStoreService {
       String userID = userModel.currentUser;
       String path = 'users/$userID/chats';
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection(path).orderBy('timestamp_last_message', descending: true).limit(1).get();
-
+      print('Log: getLatestChatroom called: userID: $userID');
       if (querySnapshot.docs.isNotEmpty) {
         print(querySnapshot.docs.first.id);
         chatStateProvider.setCurrentChatroom(querySnapshot.docs.first.id);
+      } else {
+        chatStateProvider.setCurrentChatroom('none');
       }
     } catch (e) {
       print('Error getting latest chat: $e');

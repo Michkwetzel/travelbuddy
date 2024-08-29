@@ -39,6 +39,7 @@ class _LogInScreenState extends State<LogInScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                
                 Text(
                   "Welcome back adventurer",
                   style: TextStyle(fontSize: 30),
@@ -96,41 +97,7 @@ class _LogInScreenState extends State<LogInScreen> {
                       nextScreenCall: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ChatbotScreen())),
                     );
                   },
-                ) // Consumer<UserModel>(builder: (context, userModel, child) {
-                //   return Text(userModel.currentUser);
-                // }),
-                // TextButton(
-                //   onPressed: () => {Provider.of<AuthService>(context, listen: false).signOut()},
-                //   style: ButtonStyle(backgroundColor: WidgetStateProperty.all(Colors.blue)),
-                //   child: Text(
-                //     "Sign out",
-                //     style: TextStyle(color: Colors.white),
-                //   ),
-                // ),
-                // TextButton(
-                //   onPressed: () async {
-                //     String path = 'write_to_db';
-                //     Map<String, dynamic> request = {
-                //       'collection': 'chats',
-                //       'data': {'message': 'Hi', 'name': 'WoWO'}
-                //     };
-                //     try {
-                //       final responseBody = await http.postRequest(path: path, request: request);
-                //       print('Response: $responseBody'); // Or handle the response as needed
-                //     } catch (e) {
-                //       print('Error during POST request: $e');
-                //     }
-                //   },
-                //   style: ButtonStyle(backgroundColor: WidgetStateProperty.all(Colors.blue)),
-                //   child: Text(
-                //     "Send get request",
-                //     style: TextStyle(color: Colors.white),
-                //   ),
-                // ),
-                // TextButton(
-                //   onPressed: () => (),
-                //   child: Text("User data capture"),
-                // )
+                )
               ],
             ),
           ),
