@@ -1,16 +1,20 @@
 import 'dart:convert';
 
+import 'package:front_travelbuddy/change_notifiers/chat_state_provider.dart';
 import 'package:front_travelbuddy/change_notifiers/spinner.dart';
 import 'package:front_travelbuddy/change_notifiers/user_model.dart';
+import 'package:front_travelbuddy/services/firestore_service.dart';
 import 'package:front_travelbuddy/services/http_service.dart';
 
 class BackEndService {
   //Works with http service. For database operations
   final HttpService http;
   final Spinner spinner;
+  final FireStoreService fireStoreService;
+  ChatStateProvider chatStateProvider;
   UserModel userModel;
 
-  BackEndService({required this.userModel, required this.http, required this.spinner});
+  BackEndService({required this.userModel, required this.http, required this.spinner, required this.fireStoreService, required this.chatStateProvider});
 
   /// send DB write request to backend. Must include collection and data.
   /// if docID empty then google will assign doc random docID
@@ -34,6 +38,34 @@ class BackEndService {
     }
   }
 
+  Future<String> deleteChatroom({required String chatroomID}) async {
+    try {
+      const String path = 'delete_chatroom';
+      final Map<String, dynamic> request = {'userID': userModel.currentUser, 'chatroomID': chatroomID};
+      print('Delete chatroom request: $request');
+      final response = await http.postRequest(path: path, request: request);
+      print(response.body);
+      return response.body;
+    } catch (e) {
+      spinner.hideSpinner();
+      print('error deleting chatroom - $chatroomID. Error: $e');
+      return '';
+    }
+  }
+
+  Future<String> editChatroomDescription({required String chatroomID, required String newDescription}) async {
+    const String path = 'edit_chatroom_description';
+
+    final Map<String, dynamic> request = {'userID': userModel.currentUser, 'chatroomID': chatroomID, 'newDescription': newDescription};
+
+    final response = await http.postRequest(path: path, request: request);
+    if (chatStateProvider.currentChat == chatroomID) {
+      chatStateProvider.setCurrentChatroomName(newDescription);
+    }
+    print(response.body);
+    return response.body;
+  }
+
   Future<String> createNewChatroom() async {
     try {
       spinner.showSpinner();
@@ -43,13 +75,13 @@ class BackEndService {
       final response = await http.postRequest(path: path, request: request);
       Map<String, dynamic> jsonResponse = jsonDecode(response.body);
 
-      String chatroomID = jsonResponse['chat_id'];
+      String chatroomID = jsonResponse['chatroom_id'];
       print(chatroomID);
       spinner.hideSpinner();
       return chatroomID;
     } on Exception catch (e) {
       spinner.hideSpinner();
-      print('error creating new chatroom: $e');
+      print('error creating new chatroom. Error: $e');
       return '';
     }
   }
@@ -78,7 +110,7 @@ class BackEndService {
       String userID = userModel.currentUser;
       print('Send message called for user $userID');
 
-      Map<String, dynamic> request = {'userID': userID, 'chatID': chatRoomID, 'message': userMessage};
+      Map<String, dynamic> request = {'userID': userID, 'chatroomID': chatRoomID, 'message': userMessage};
 
       var response = await http.postRequest(path: '/receive_user_massage', request: request);
       var log = response.body;

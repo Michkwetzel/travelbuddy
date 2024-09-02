@@ -33,8 +33,10 @@ void main() async {
                 )),
         Provider(
             create: (context) => BackEndService(
+                  chatStateProvider: context.read<ChatStateProvider>(),
                   userModel: context.read<UserModel>(),
                   http: context.read<HttpService>(),
+                  fireStoreService: context.read<FireStoreService>(),
                   spinner: context.read<Spinner>(),
                 )),
         ChangeNotifierProvider(

@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:front_travelbuddy/change_notifiers/chat_state_provider.dart';
 import 'package:front_travelbuddy/change_notifiers/spinner.dart';
 import 'package:front_travelbuddy/change_notifiers/user_model.dart';
 import 'back_end_service.dart';
@@ -34,7 +36,8 @@ class AuthService {
           print('No user signed in!');
         } else {
           userModel.setUser(user.uid);
-          fireStoreService.getLatestChatroom();
+          fireStoreService.getAndSetChatroomAtIndex(chatroomIndex: 0);
+          
           final userID = user.uid;
           print('User Change signalled - UserID: $userID');
           // Additional actions for sign-in (e.g., fetch user profile)
@@ -137,10 +140,11 @@ class AuthService {
     }
   }
 
-  Future<void> signOut() async {
+  Future<void> signOut(VoidCallback nextScreenCall) async {
     try {
       await _auth.signOut();
       fireStoreStreamProvider.userChangeStreamUpdate();
+      nextScreenCall();
       print('signed out');
     } catch (e) {
       print(e);
