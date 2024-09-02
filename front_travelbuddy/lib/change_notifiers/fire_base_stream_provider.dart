@@ -46,7 +46,7 @@ class FireStoreStreamProvider with ChangeNotifier {
 
   void userChangeStreamUpdate() {
     updateChatRoomStream();
-    fireStoreService.getLatestChatroom();
+    fireStoreService.getAndSetChatroomAtIndex(chatroomIndex: 0);
     notifyListeners();
   }
 }

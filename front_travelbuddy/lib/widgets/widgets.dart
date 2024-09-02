@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:front_travelbuddy/change_notifiers/chat_state_provider.dart';
+import 'package:front_travelbuddy/services/back_end_service.dart';
+import 'package:provider/provider.dart';
 
 class LineBreak extends StatelessWidget {
   const LineBreak({super.key});
@@ -60,6 +63,50 @@ class GoogleSignInButton extends StatelessWidget {
       ),
     );
   }
+}
+
+Future<void> editChatDescriptionDialogue(BuildContext context, String currentChatDescription, Function(String newDescription) editChatDescription) async {
+  TextEditingController textController = TextEditingController(text: currentChatDescription);
+  
+  return showDialog<void>(
+    context: context,
+    builder: (BuildContext dialogContext) {
+      return AlertDialog(
+        title: Text('Rename chat'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(height: 16),
+            Text('Enter a new name for the chat:'),
+            TextField(
+              controller: textController,
+              decoration: InputDecoration(
+                hintText: 'Enter new chat name',
+              ),
+            ),
+          ],
+        ),
+        actions: <Widget>[
+          TextButton(
+            child: Text('Cancel'),
+            onPressed: () {
+              Navigator.of(dialogContext).pop();
+            },
+          ),
+          TextButton(
+            child: Text('Rename'),
+            onPressed: () {
+              String newDescription = textController.text;
+              if (newDescription.isNotEmpty && newDescription != currentChatDescription) {
+                editChatDescription(newDescription);
+              }
+              Navigator.of(dialogContext).pop();
+            },
+          ),
+        ],
+      );
+    },
+  );
 }
 
 Future<void> emailVertificationDialog(BuildContext context, String displayMessage) {

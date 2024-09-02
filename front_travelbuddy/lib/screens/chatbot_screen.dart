@@ -3,7 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:front_travelbuddy/change_notifiers/chat_state_provider.dart';
 import 'package:front_travelbuddy/change_notifiers/fire_base_stream_provider.dart';
 import 'package:front_travelbuddy/change_notifiers/spinner.dart';
+import 'package:front_travelbuddy/screens/welcome_screen.dart';
+import 'package:front_travelbuddy/services/auth_service.dart';
 import 'package:front_travelbuddy/services/back_end_service.dart';
+import 'package:front_travelbuddy/services/firestore_service.dart';
+import 'package:front_travelbuddy/widgets/widgets.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:provider/provider.dart';
 import 'dart:core';
@@ -23,6 +27,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> with SingleTickerProvider
   late FireStoreStreamProvider streamProvider;
   late ChatStateProvider chatStateProvider;
   late AnimationController drawerController;
+  late AuthService authService;
 
   void toggleDrawer() {
     if (drawerController.isCompleted) {
@@ -52,10 +57,27 @@ class _ChatbotScreenState extends State<ChatbotScreen> with SingleTickerProvider
     backEndService = Provider.of<BackEndService>(context, listen: false);
     streamProvider = Provider.of<FireStoreStreamProvider>(context);
     chatStateProvider = Provider.of<ChatStateProvider>(context);
+    authService = Provider.of<AuthService>(context);
 
     return Scaffold(
       appBar: AppBar(
-          title: Text("Travel Buddy"),
+          title: Stack(
+            children: [
+              Align(
+                alignment: Alignment.centerLeft,
+                child: SizedBox(
+                    width: 150,
+                    child: Text(
+                      chatStateProvider.currentChatroomName,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    )),
+              ),
+              Align(
+                alignment: Alignment.center,
+                child: Text("Travel Buddy")),
+            ],
+          ),
           leading: IconButton(
             icon: Icon(Icons.menu),
             onPressed: toggleDrawer,
@@ -64,7 +86,14 @@ class _ChatbotScreenState extends State<ChatbotScreen> with SingleTickerProvider
         inAsyncCall: Provider.of<Spinner>(context).spinner,
         child: Row(
           children: [
-            ChatRoomDrawer(isDrawerOpen: isDrawerOpen, controller: drawerController, backEndService: backEndService, chatStateProvider: chatStateProvider, streamProvider: streamProvider),
+            ChatRoomDrawer(
+              isDrawerOpen: isDrawerOpen,
+              controller: drawerController,
+              backEndService: backEndService,
+              chatStateProvider: chatStateProvider,
+              streamProvider: streamProvider,
+              authService: authService,
+            ),
             SizedBox(
               width: 150,
             ),
@@ -164,6 +193,7 @@ class ChatRoomDrawer extends StatelessWidget {
     required this.chatStateProvider,
     required this.streamProvider,
     required this.controller,
+    required this.authService,
   });
 
   final bool isDrawerOpen;
@@ -171,6 +201,7 @@ class ChatRoomDrawer extends StatelessWidget {
   final ChatStateProvider chatStateProvider;
   final FireStoreStreamProvider streamProvider;
   final AnimationController controller;
+  final AuthService authService;
 
   @override
   Widget build(BuildContext context) {
@@ -182,14 +213,24 @@ class ChatRoomDrawer extends StatelessWidget {
           color: Colors.blue[100],
           child: Column(
             children: [
-              NewChatButton(
+              DrawerFunctionButton(
+                  text: 'New Chat',
+                  icon: Icon(Icons.chat),
                   controller: controller,
                   onTap: () async {
                     String chatRoomID = await backEndService.createNewChatroom();
+                    chatStateProvider.setCurrentChatroomName('New chatroom');
                     chatStateProvider.setCurrentChatroom(chatRoomID);
                     streamProvider.updateMessageStream();
                   }),
               ChatRoomStreamBuilder(streamProvider: streamProvider, chatStateProvider: chatStateProvider, controller: controller),
+              DrawerFunctionButton(
+                  controller: controller,
+                  onTap: () => authService.signOut(
+                        () => Navigator.push(context, MaterialPageRoute(builder: (context) => WelcomeScreen())),
+                      ),
+                  icon: Icon(Icons.logout),
+                  text: 'Log Out'),
             ],
           ),
         );
@@ -223,27 +264,25 @@ class ChatRoomStreamBuilder extends StatelessWidget {
                 maxLines: 1,
               );
             } else if (snapshot.connectionState == ConnectionState.waiting || !snapshot.hasData || snapshot.data!.docs.isEmpty) {
-              return Text(
-                'Loading',
-                softWrap: false,
-                maxLines: 1,
-              );
+              return Expanded(child: SizedBox());
             } else {
-              List<ChatRoomButtonBuilder> chatTiles = [];
+              List<ChatRoomButton> chatTiles = [];
               final chats = snapshot.data!.docs;
               for (var chat in chats) {
                 // Maybe here is overkill in code
                 Map<String, dynamic> data = chat.data() as Map<String, dynamic>;
-                String chatDescription = data['description'];
-                chatTiles.add(ChatRoomButtonBuilder(
-                  onDelete: () {},
-                  onEditDescription: () {},
+                String chatDescription = data['description'] ?? "Travel Chat";
+
+                String chatroomID = chat.id;
+                chatTiles.add(ChatRoomButton(
                   controller: controller,
                   icon: Icons.ac_unit,
                   text: chatDescription,
+                  chatroomID: chatroomID,
                   onTap: () {
-                    String chatRoomID = chat.id;
-                    chatStateProvider.setCurrentChatroom(chatRoomID);
+                    print(chatroomID);
+                    chatStateProvider.setCurrentChatroomName(chatDescription);
+                    chatStateProvider.setCurrentChatroom(chatroomID);
                   },
                 ));
               }
@@ -254,25 +293,27 @@ class ChatRoomStreamBuilder extends StatelessWidget {
   }
 }
 
-class NewChatButton extends StatelessWidget {
+class DrawerFunctionButton extends StatelessWidget {
   final VoidCallback onTap;
   final AnimationController controller;
+  final Icon icon;
+  final String text;
 
-  const NewChatButton({super.key, required this.controller, required this.onTap});
+  const DrawerFunctionButton({super.key, required this.controller, required this.onTap, required this.icon, required this.text});
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 50,
+    return Container(
+      constraints: BoxConstraints(minHeight: 50),
       child: ClipRect(
         child: AnimatedBuilder(
             animation: controller,
             builder: (context, child) {
               return Align(
                 child: TextButton.icon(
-                  icon: Icon(Icons.chat),
+                  icon: icon,
                   label: Text(
-                    'New Chat',
+                    text,
                     softWrap: false,
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
@@ -290,87 +331,96 @@ class NewChatButton extends StatelessWidget {
   }
 }
 
-class ChatRoomButtonBuilder extends StatefulWidget {
-  const ChatRoomButtonBuilder({
+class ChatRoomButton extends StatefulWidget {
+  const ChatRoomButton({
     super.key,
     required this.controller,
     required this.text,
     required this.icon,
     required this.onTap,
-    required this.onDelete,
-    required this.onEditDescription,
+    required this.chatroomID,
   });
 
   final AnimationController controller;
   final String text;
   final IconData icon;
   final VoidCallback onTap;
-  final VoidCallback onDelete;
-  final VoidCallback onEditDescription;
+  final String chatroomID;
 
   @override
-  State<ChatRoomButtonBuilder> createState() => _ChatRoomButtonBuilderState();
+  State<ChatRoomButton> createState() => _ChatRoomButtonState();
 }
 
-class _ChatRoomButtonBuilderState extends State<ChatRoomButtonBuilder> {
+class _ChatRoomButtonState extends State<ChatRoomButton> {
   bool _isHovered = false;
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 50,
+    BackEndService backEndService = Provider.of<BackEndService>(context);
+    ChatStateProvider chatStateProvider = Provider.of<ChatStateProvider>(context);
+    FireStoreService fireStoreService = Provider.of<FireStoreService>(context);
+
+    return Container(
+      constraints: BoxConstraints(minHeight: 50),
       child: ClipRect(
         child: AnimatedBuilder(
           animation: widget.controller,
           builder: (context, child) {
-            return Align(
-              alignment: Alignment(-1.0, 0.0),
-              child: MouseRegion(
-                onEnter: (event) => setState(() => _isHovered = true),
-                onExit: (event) => setState(() => _isHovered = false),
-                child: Row(children: [
-                  Expanded(
-                    child: TextButton.icon(
-                      icon: Icon(widget.icon),
-                      label: Text(
-                        widget.text,
-                        softWrap: false,
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                      ),
-                      onPressed: widget.onTap,
-                      style: TextButton.styleFrom(
-                        alignment: Alignment.centerLeft,
-                        padding: const EdgeInsets.only(right: 16, left: 10),
-                      ),
+            BuildContext dialogContext = context;
+            return MouseRegion(
+              onEnter: (event) => setState(() => _isHovered = true),
+              onExit: (event) => setState(() => _isHovered = false),
+              child: Row(children: [
+                Expanded(
+                  child: TextButton.icon(
+                    icon: Icon(widget.icon),
+                    label: Text(
+                      widget.text,
+                      softWrap: false,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
+                    onPressed: widget.onTap,
+                    style: TextButton.styleFrom(
+                      alignment: Alignment.centerLeft,
+                      padding: const EdgeInsets.only(right: 16, left: 10),
                     ),
                   ),
-                  if (_isHovered)
-                    Positioned(
-                      child: PopupMenuButton<String>(
-                        icon: Icon(
-                          Icons.more_vert,
-                          size: 20,
-                        ),
-                        itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                          const PopupMenuItem<String>(child: Text('Delete Chat'), value: 'delete'),
-                          const PopupMenuItem<String>(
-                            child: Text('Rename Chat'),
-                            value: 'rename',
-                          ),
-                        ],
-                        onSelected: (String value) {
-                          // Handle menu item selection
-                          if (value == 'rename') {
-                            // TODO: Implement rename functionality
-                          } else if (value == 'delete') {
-                            // TODO: Implement delete functionality
+                ),
+                if (_isHovered)
+                  PopupMenuButton<String>(
+                    icon: Icon(
+                      Icons.more_vert,
+                      size: 20,
+                    ),
+                    itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                      PopupMenuItem<String>(
+                        child: Text('Delete Chat'),
+                        value: 'delete',
+                        onTap: () {
+                          if (widget.chatroomID == chatStateProvider.currentChat) {
+                            fireStoreService.getAndSetChatroomAtIndex(justDeletedChat: true);
                           }
+                          backEndService.deleteChatroom(chatroomID: widget.chatroomID);
                         },
                       ),
-                    )
-                ]),
-              ),
+                      PopupMenuItem<String>(
+                        child: Text('Rename Chat'),
+                        value: 'rename',
+                        onTap: () {
+                          editChatDescriptionDialogue(
+                            dialogContext,
+                            widget.text,
+                            (newDescription) => backEndService.editChatroomDescription(
+                              chatroomID: widget.chatroomID,
+                              newDescription: newDescription,
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  )
+              ]),
             );
           },
         ),

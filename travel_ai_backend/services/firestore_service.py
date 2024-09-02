@@ -74,8 +74,8 @@ class FirestoreService:
 
         return chatroom_doc_ref.id
 
-    def update_chatroom_latest_timestamp(self, user_id: str, chat_id: str, timestamp):
-        doc_ref = self.db.collection(f'users/{user_id}/chats').document(chat_id)
+    def update_chatroom_latest_timestamp(self, user_id: str, chatroom_id: str, timestamp):
+        doc_ref = self.db.collection(f'users/{user_id}/chats').document(chatroom_id)
         doc_ref.update({'timestamp_last_message': timestamp})
         print(f"Chatroom: users/{user_id}/chats/{doc_ref.id} updated with, timestamp_last_message': {timestamp}")
         return 'Success'
@@ -115,7 +115,37 @@ class FirestoreService:
 
     def delete_doc(self, doc_path: str, doc_id: str) -> None:
         """Deletes a document by its ID."""
-        self.db.collection(doc_path).document(doc_id).delete()
+        print(f'doc_path: {doc_path}, doc_id: {doc_id}')
+        doc_ref = self.db.collection(doc_path).document(doc_id)
+        doc_ref.delete()
+
+    def delete_collection(self, user_id: str, chatroom_id: str , batch_size: int = 300):
+        message_path = f'users/{user_id}/chats/{chatroom_id}/messages'
+
+        if batch_size == 0:
+            return
+
+        coll_ref = self.db.collection(message_path)
+        docs = coll_ref.list_documents()
+        deleted = 0
+        self.db.collection(f'users/{user_id}/chats').document(chatroom_id).delete()
+
+        for doc in docs:
+            doc.delete()
+            deleted = deleted + 1
+
+        if deleted >= batch_size:
+            self.delete_collection(message_path, chatroom_id, batch_size)
+
+
+    def change_document_field(self, user_id: str, chatroom_id: str , field: str, value: str):
+
+        doc_ref = self.db.collection(f'users/{user_id}/chats').document(chatroom_id)
+        doc_ref.update({f'{field}': value})
+        print(f"Chatroom: users/{user_id}/chats/{doc_ref.id} updated with, {field}': {value}")
+        return 'Success'
+
+
 
     def delete_field(self, doc_path: str, doc_id: str, field: str) -> None:
         """Deletes a specific field from a document."""

@@ -55,19 +55,41 @@ class FireStoreService {
     }
   }
 
-  Future<void> getLatestChatroom() async {
+  Future<void> getAndSetChatroomAtIndex({int chatroomIndex = 0, bool justDeletedChat = false}) async {
+    //Set chatroom stream. If just deleted, it checks if current chat is one being deleted, if yes change to most recent however if current chat is latest, change to 2nd latest. This is because 1st will be deleted.
     try {
       String userID = userModel.currentUser;
       String path = 'users/$userID/chats';
-      QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection(path).orderBy('timestamp_last_message', descending: true).limit(1).get();
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection(path).orderBy('timestamp_last_message', descending: true).limit(3).get();
       print('Log: getLatestChatroom called: userID: $userID');
       if (querySnapshot.docs.isNotEmpty) {
-        print(querySnapshot.docs.first.id);
-        chatStateProvider.setCurrentChatroom(querySnapshot.docs.first.id);
+        List firstFewDocNames = [];
+        for (QueryDocumentSnapshot document in querySnapshot.docs) {
+          Map<String, dynamic> data = document.data() as Map<String, dynamic>;
+          if (data['description'] != null) {
+            firstFewDocNames.add(data['description']);
+          }
+        }
+        if (justDeletedChat) {
+          if (chatStateProvider.currentChat == querySnapshot.docs.first.id) {
+            chatStateProvider.setCurrentChatroomName(firstFewDocNames[1] ?? '');
+            chatStateProvider.setCurrentChatroom(querySnapshot.docs.elementAt(1).id);
+          } else {
+            chatStateProvider.setCurrentChatroomName(firstFewDocNames[0] ?? '');
+
+            chatStateProvider.setCurrentChatroom(querySnapshot.docs.elementAt(0).id);
+          }
+        } else {
+          chatStateProvider.setCurrentChatroomName(firstFewDocNames[0] ?? '');
+
+          chatStateProvider.setCurrentChatroom(querySnapshot.docs.elementAt(chatroomIndex).id);
+        }
       } else {
+        chatStateProvider.setCurrentChatroomName('');
         chatStateProvider.setCurrentChatroom('none');
       }
     } catch (e) {
+      chatStateProvider.setCurrentChatroom('none');
       print('Error getting latest chat: $e');
     }
   }
