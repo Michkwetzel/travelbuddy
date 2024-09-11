@@ -9,28 +9,30 @@ class LineBreak extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(10.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            width: 200,
-            color: Colors.black,
-            height: 1,
-          ),
-          Padding(
-            child: Text('Or'),
-            padding: EdgeInsets.symmetric(horizontal: 10),
-          ),
-          Container(
-            width: 200,
-            color: Colors.black,
-            height: 1,
-          ),
-        ],
-      ),
-    );
+    return LayoutBuilder(builder: (context, constraints) {
+      return Padding(
+        padding: const EdgeInsets.all(10.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 200,
+              color: Colors.black,
+              height: 1,
+            ),
+            Padding(
+              child: Text('Or'),
+              padding: EdgeInsets.symmetric(horizontal: 10),
+            ),
+            Container(
+              width: 200,
+              color: Colors.black,
+              height: 1,
+            ),
+          ],
+        ),
+      );
+    });
   }
 }
 
@@ -67,7 +69,7 @@ class GoogleSignInButton extends StatelessWidget {
 
 Future<void> editChatDescriptionDialogue(BuildContext context, String currentChatDescription, Function(String newDescription) editChatDescription) async {
   TextEditingController textController = TextEditingController(text: currentChatDescription);
-  
+
   return showDialog<void>(
     context: context,
     builder: (BuildContext dialogContext) {

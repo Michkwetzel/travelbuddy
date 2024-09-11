@@ -68,7 +68,7 @@ class BackEndService {
 
   Future<String> createNewChatroom() async {
     try {
-      spinner.showSpinner();
+      //spinner.showSpinner();
       const String path = 'create_new_chatroom';
       final Map<String, dynamic> request = {'userID': userModel.currentUser};
 
@@ -77,10 +77,10 @@ class BackEndService {
 
       String chatroomID = jsonResponse['chatroom_id'];
       print(chatroomID);
-      spinner.hideSpinner();
+      //spinner.hideSpinner();
       return chatroomID;
     } on Exception catch (e) {
-      spinner.hideSpinner();
+      //spinner.hideSpinner();
       print('error creating new chatroom. Error: $e');
       return '';
     }
