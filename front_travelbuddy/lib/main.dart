@@ -55,6 +55,8 @@ void main() async {
                 ))
       ],
       child: MaterialApp(
+        title: 'TravelBuddy',
+        theme: ThemeData(fontFamily: 'Sorts Mill Goudy',),
         home: WelcomeScreen(),
       ),
     ),

@@ -25,10 +25,7 @@ class _LogInScreenState extends State<LogInScreen> {
 
     return Scaffold(
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => passwordResetDialog(
-          context,
-          (email) => Provider.of<AuthService>(context, listen: false).resetPassword(userEmail: email),
-        ),
+        onPressed: () => passwordResetDialog(context, (email) => Provider.of<AuthService>(context, listen: false).resetPassword(userEmail: email)),
         label: Text("Reset Password"),
       ),
       body: ModalProgressHUD(
@@ -39,7 +36,6 @@ class _LogInScreenState extends State<LogInScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                
                 Text(
                   "Welcome back adventurer",
                   style: TextStyle(fontSize: 30),
