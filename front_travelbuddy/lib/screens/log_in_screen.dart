@@ -23,82 +23,234 @@ class _LogInScreenState extends State<LogInScreen> {
   Widget build(BuildContext context) {
     //provide spinner callback to authService
 
+    void logIn() async {
+      await Provider.of<AuthService>(context, listen: false).signInWithEmailAndPassword(
+        userEmail: userEmail,
+        userPassword: userPassword,
+        emailVerificationPopUp: () => emailVertificationDialog(context, 'Another verification link has been sent to your email.\nPlease verify your account and log in.'),
+        nextScreenCall: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ChatbotScreen())),
+      );
+    }
+
     return Scaffold(
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => passwordResetDialog(context, (email) => Provider.of<AuthService>(context, listen: false).resetPassword(userEmail: email)),
-        label: Text("Reset Password"),
+      floatingActionButton: Container(
+        height: 35,
+        child: FloatingActionButton.extended(
+          backgroundColor: Colors.white.withOpacity(0.80),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(40),
+          ),
+          onPressed: () => passwordResetDialog(
+            context,
+            (email) => Provider.of<AuthService>(context, listen: false).resetPassword(userEmail: email),
+          ),
+          label: Text("Forget Password?", style: TextStyle(fontSize: 15, fontFamily: 'Bhavuka', fontWeight: FontWeight.w600, color: Colors.black)),
+        ),
       ),
-      body: ModalProgressHUD(
-        inAsyncCall: Provider.of<Spinner>(context).spinner,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 50),
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  "Welcome back adventurer",
-                  style: TextStyle(fontSize: 30),
+      body: LayoutBuilder(builder: (context, constraints) {
+        double width;
+        double height;
+        double windowRatio = constraints.maxWidth / constraints.maxHeight;
+
+        if (windowRatio < 1792 / 1024) {
+          height = constraints.maxHeight;
+          width = constraints.maxHeight * 1792 / 1024;
+        } else {
+          height = constraints.maxWidth * 1024 / 1792;
+          width = constraints.maxWidth;
+        }
+        return SingleChildScrollView(
+          scrollDirection: Axis.vertical,
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Stack(alignment: Alignment.center, fit: StackFit.loose, children: [
+              ConstrainedBox(
+                constraints: BoxConstraints.expand(height: height, width: width),
+                child: Image.asset(
+                  'assets/background/log_in_ocean.jpg',
+                  fit: BoxFit.fill,
                 ),
-                SizedBox(
-                  height: 20,
-                ),
-                Text(
-                  "email",
-                  textAlign: TextAlign.end,
-                ),
-                SizedBox(
-                  width: 500,
-                  child: TextField(
-                      onChanged: (value) {
-                        userEmail = value;
-                      },
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(25)),
+              ),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    height: 60,
+                    width: 400,
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                        opacity: 0.89,
+                        colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                        fit: BoxFit.fill,
+                        image: AssetImage('assets/brush_strokes/blue_4.png'),
+                      ),
+                    ),
+                    child: Center(
+                      child: Text(
+                        textAlign: TextAlign.center,
+                        "Welcome back adventurer",
+                        style: TextStyle(
+                          fontSize: 35,
+                          fontFamily: 'Bhavuka',
+                        ),
+                      ),
+                    ),
+                  ),
+                  Container(
+                    height: 40,
+                    width: 70,
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                        opacity: 0.89,
+                        colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                        fit: BoxFit.fill,
+                        image: AssetImage('assets/brush_strokes/blue_2.png'),
+                      ),
+                    ),
+                    child: Center(
+                      child: Text(
+                        textAlign: TextAlign.center,
+                        "Email",
+                        style: TextStyle(fontSize: 18, fontFamily: 'Montserrat', fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                      width: 500,
+                      height: 48,
+                      child: LogInTextfield(
+                        onChanged: (value) {
+                          userEmail = value;
+                        },
+                        onSubmit: () => logIn(),
                       )),
-                ),
-                Text("Password"),
-                Container(
-                  width: 500,
-                  child: TextField(
-                      onChanged: (value) {
-                        userPassword = value;
-                      },
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(25)),
+                  Container(
+                    height: 40,
+                    width: 100,
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                        opacity: 0.89,
+                        colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                        fit: BoxFit.fill,
+                        image: AssetImage('assets/brush_strokes/blue_2.png'),
+                      ),
+                    ),
+                    child: Center(
+                      child: Text(
+                        textAlign: TextAlign.center,
+                        "Password",
+                        style: TextStyle(fontSize: 18, fontFamily: 'Montserrat', fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                      width: 500,
+                      height: 48,
+                      child: LogInTextfield(
+                        onChanged: (value) {
+                          userPassword = value;
+                        },
+                        onSubmit: () => logIn(),
                       )),
-                ),
-                SizedBox(
-                  height: 20,
-                ),
-                ElevatedButton(
-                  onPressed: () async {
-                    //Sign in with username and Password
-                    await Provider.of<AuthService>(context, listen: false).signInWithEmailAndPassword(
-                      userEmail: userEmail,
-                      userPassword: userPassword,
-                      emailVerificationPopUp: () => emailVertificationDialog(context, 'Another verification link has been sent to your email.\nPlease verify your account and log in.'),
-                      nextScreenCall: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ChatbotScreen())),
-                    );
-                  },
-                  child: Text("Log in"),
-                ),
-                SizedBox(
-                  width: 20,
-                ),
-                LineBreak(),
-                GoogleSignInButton(
-                  onPressed: () async {
-                    await Provider.of<AuthService>(context, listen: false).signInWithGoogle(
-                      nextScreenCall: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ChatbotScreen())),
-                    );
-                  },
-                )
-              ],
-            ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  ElevatedButton(
+                    onPressed: () => logIn(),
+                    child: Text("Log in", style: TextStyle(fontSize: 13, fontFamily: 'Roboto', fontWeight: FontWeight.normal, color: Colors.black87)),
+                  ),
+                  SizedBox(
+                    width: 20,
+                  ),
+                  LineBreak(colour: 'white'),
+                  GoogleSignInButton(
+                    onPressed: () async {
+                      await Provider.of<AuthService>(context, listen: false).signInWithGoogle(
+                        nextScreenCall: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ChatbotScreen())),
+                      );
+                    },
+                  )
+                ],
+              ),
+            ]),
+          ),
+        );
+      }),
+    );
+  }
+}
+
+class LogInTextfield extends StatefulWidget {
+  final Function(String) onChanged;
+  final VoidCallback onSubmit;
+
+  const LogInTextfield({Key? key, required this.onChanged, required this.onSubmit}) : super(key: key);
+
+  @override
+  _LogInTextfield createState() => _LogInTextfield();
+}
+
+class _LogInTextfield extends State<LogInTextfield> {
+  bool _isFocused = false;
+  bool _hasText = false;
+  final TextEditingController _controller = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _controller.addListener(_updateHasText);
+  }
+
+  @override
+  void dispose() {
+    _controller.removeListener(_updateHasText);
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _updateHasText() {
+    setState(() {
+      _hasText = _controller.text.isNotEmpty;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Focus(
+      onFocusChange: (hasFocus) {
+        setState(() {
+          _isFocused = hasFocus;
+        });
+      },
+      child: TextField(
+        controller: _controller,
+        onChanged: (value) {
+          widget.onChanged(value);
+          _updateHasText();
+        },
+        onSubmitted: (value) => widget.onSubmit(),
+        style: TextStyle(fontSize: 17, fontFamily: 'Montserrat', fontWeight: FontWeight.bold),
+        textAlign: TextAlign.center,
+        decoration: InputDecoration(
+          filled: true,
+          fillColor: _isFocused || _hasText ? Colors.white.withOpacity(0.85) : Colors.white.withOpacity(0.47),
+          focusColor: Colors.white.withOpacity(0.85),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(25),
+            borderSide: BorderSide(width: 1.4, color: Colors.white),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(25),
+            borderSide: BorderSide(color: Colors.white),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(25),
+            borderSide: BorderSide(color: _hasText ? Colors.white : Colors.white.withOpacity(0.47)),
           ),
         ),
       ),
     );
   }
 }
+
+//passwordResetDialog(context, (email) => Provider.of<AuthService>(context, listen: false).resetPassword(userEmail: email))

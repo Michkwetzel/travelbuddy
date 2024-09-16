@@ -12,8 +12,9 @@ class WelcomeScreen extends StatelessWidget {
         double width;
         double height;
         double windowRatio = constraints.maxWidth / constraints.maxHeight;
+        double temp = 0.8;
 
-        if (windowRatio < 16 / 9) {
+        if (windowRatio <= (1791 / 993)) {
           height = constraints.maxHeight;
           width = constraints.maxHeight * 1791 / 993;
         } else {
@@ -27,18 +28,18 @@ class WelcomeScreen extends StatelessWidget {
             scrollDirection: Axis.horizontal,
             child: Stack(children: [
               ConstrainedBox(
-                constraints: BoxConstraints(maxHeight: height, maxWidth: width),
+                constraints: BoxConstraints.expand(height: height, width: width),
                 child: Image.asset(
-                  'assets/background/_4ed7e042-0cde-4836-bc0d-c155d0c50ba0.jpg',
+                  'assets/background/welcome_mountains.jpg',
                   fit: BoxFit.fill,
                 ),
               ),
               Positioned(
-                top: 0.25 * height,
-                right: 0.15 * width,
+                top: 0.25 * height ,
+                right: 0.18 * width,
                 child: Container(
-                  width: 0.35 * width,
-                  height: 0.2 * height,
+                  width: 0.35 * width * temp,
+                  height: 0.2 * height * temp,
                   decoration: BoxDecoration(
                     image: DecorationImage(
                       image: AssetImage('assets/brush_strokes/orange_1.png'),
@@ -51,13 +52,13 @@ class WelcomeScreen extends StatelessWidget {
                     children: [
                       Text(
                         "The world is a beautiful place",
-                        style: TextStyle(fontSize: width * 0.019, fontWeight: FontWeight.w100, color: Colors.white, decoration: TextDecoration.none, fontFamily: 'Sorts Mill Goudy'),
+                        style: TextStyle(fontSize: width * 0.019* temp, fontWeight: FontWeight.w100, color: Colors.white, decoration: TextDecoration.none, fontFamily: 'Sorts Mill Goudy'),
                       ),
                       Align(
-                        alignment: Alignment(0.55, 0),
+                        alignment: Alignment(0.54, 0),
                         child: Text(
                           "Let's learn about it",
-                          style: TextStyle(fontSize: width * 0.015, color: Colors.white, decoration: TextDecoration.none, fontWeight: FontWeight.normal, fontFamily: 'Sorts Mill Goudy'),
+                          style: TextStyle(fontSize: width * 0.015* temp, color: Colors.white, decoration: TextDecoration.none, fontWeight: FontWeight.normal, fontFamily: 'Sorts Mill Goudy'),
                         ),
                       ),
                     ],
@@ -65,38 +66,38 @@ class WelcomeScreen extends StatelessWidget {
                 ),
               ),
               Positioned(
-                top: 0.45 * height,
-                right: 0.22 * width,
+                top: 0.41 * height,
+                right: 0.235 * width,
                 child: Container(
-                  height: 0.1 * height,
-                  width: 0.2 * width,
+                  height: 0.1 * height* temp,
+                  width: 0.2 * width* temp,
                   decoration: BoxDecoration(image: DecorationImage(image: AssetImage('assets/brush_strokes/orange_3.png'))),
                   child: AspectRatio(
                     aspectRatio: windowRatio,
                     child: Align(
-                      alignment: Alignment(0.11, 0),
+                      alignment: Alignment(0.11, -0.1),
                       child: TextButton(
                         onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => LogInScreen())),
-                        child: Text('Log in', style: TextStyle(fontSize: width * 0.013, color: Colors.white, decoration: TextDecoration.none)),
+                        child: Text('Log in', style: TextStyle(fontSize: width * 0.0135* temp, color: Colors.white, decoration: TextDecoration.none)),
                       ),
                     ),
                   ),
                 ),
               ),
               Positioned(
-                top: 0.55 * height,
-                right: 0.22 * width,
+                top: 0.48 * height,
+                right: 0.235 * width,
                 child: Container(
-                  height: 0.1 * height,
-                  width: 0.2 * width,
+                  height: 0.1 * height* temp,
+                  width: 0.2 * width* temp,
                   decoration: BoxDecoration(image: DecorationImage(image: AssetImage('assets/brush_strokes/orange_3.png'))),
                   child: AspectRatio(
                     aspectRatio: windowRatio,
                     child: Align(
-                      alignment: Alignment(0.11, 0),
+                      alignment: Alignment(0.11, -0.1),
                       child: TextButton(
                         onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => RegisterScreen())),
-                        child: Text('Sign up', style: TextStyle(fontSize: width * 0.013, color: Colors.white, decoration: TextDecoration.none)),
+                        child: Text('Sign up', style: TextStyle(fontSize: width * 0.0135* temp, color: Colors.white, decoration: TextDecoration.none)),
                       ),
                     ),
                   ),
