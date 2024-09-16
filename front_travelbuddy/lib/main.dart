@@ -3,13 +3,14 @@ import 'package:front_travelbuddy/change_notifiers/chat_state_provider.dart';
 import 'package:front_travelbuddy/change_notifiers/spinner.dart';
 import 'package:front_travelbuddy/change_notifiers/fire_base_stream_provider.dart';
 import 'package:front_travelbuddy/change_notifiers/user_model.dart';
+import 'package:front_travelbuddy/screens/log_in_screen.dart';
+import 'package:front_travelbuddy/screens/welcome_screen.dart';
 import 'package:front_travelbuddy/services/auth_service.dart';
 import 'package:front_travelbuddy/services/back_end_service.dart';
 import 'package:front_travelbuddy/services/firestore_service.dart';
 import 'package:front_travelbuddy/services/http_service.dart';
 import 'firebase_options.dart';
 import 'package:flutter/material.dart';
-import 'package:front_travelbuddy/screens/welcome_screen.dart';
 import 'package:provider/provider.dart';
 
 void main() async {

@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:front_travelbuddy/change_notifiers/chat_state_provider.dart';
-import 'package:front_travelbuddy/services/back_end_service.dart';
-import 'package:provider/provider.dart';
 
 class LineBreak extends StatelessWidget {
-  const LineBreak({super.key});
+  final String colour;
+
+  const LineBreak({this.colour = 'white', super.key});
 
   @override
   Widget build(BuildContext context) {
+    Color paintColour;
+    if (colour == 'white') {
+      paintColour = Colors.white;
+    } else {
+      paintColour = Colors.black;
+    }
     return LayoutBuilder(builder: (context, constraints) {
       return Padding(
         padding: const EdgeInsets.all(10.0),
@@ -17,16 +22,19 @@ class LineBreak extends StatelessWidget {
           children: [
             Container(
               width: 200,
-              color: Colors.black,
+              color: paintColour,
               height: 1,
             ),
             Padding(
-              child: Text('Or'),
+              child: Text(
+                'Or',
+                style: TextStyle(color: paintColour),
+              ),
               padding: EdgeInsets.symmetric(horizontal: 10),
             ),
             Container(
               width: 200,
-              color: Colors.black,
+              color: paintColour,
               height: 1,
             ),
           ],
@@ -45,7 +53,7 @@ class GoogleSignInButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       height: 40,
-      width: 250,
+      width: 230,
       child: ElevatedButton(
         onPressed: onPressed,
         child: Row(
@@ -57,9 +65,9 @@ class GoogleSignInButton extends StatelessWidget {
               height: 30,
             ),
             SizedBox(
-              width: 5,
+              width: 6,
             ),
-            Text('Sign in with Google')
+            Text('Sign in with Google', style: TextStyle(fontSize: 14, fontFamily: 'Roboto', fontWeight: FontWeight.w100, color: Colors.black87),)
           ],
         ),
       ),
