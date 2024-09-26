@@ -124,7 +124,7 @@ class _LogInScreenCopyState extends State<LogInScreenCopy> {
                   alignment: Alignment.center,
                   children: [
                     Image.asset(
-                      'assets/background/_7c68ee49-4718-47c3-9e6b-b81e1f14a7b7.jpg',
+                      'assets/background/log_in_camel2.jpg',
                       fit: BoxFit.cover,
                       width: width,
                       height: height,
@@ -294,19 +294,19 @@ class _LogInTextfield extends State<LogInTextfield> {
         textAlign: TextAlign.center,
         decoration: InputDecoration(
           filled: true,
-          fillColor: _isFocused || _hasText ? Colors.white.withOpacity(0.85) : Colors.white.withOpacity(0.85),
+          fillColor: _isFocused || _hasText ? Colors.white.withOpacity(0.85) : Colors.white.withOpacity(0.40),
           focusColor: Colors.white.withOpacity(0.85),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(25),
-            borderSide: BorderSide(width: 0.1, color: Color.fromARGB(255, 201, 194, 191)),
+            borderSide: BorderSide(width: 0.1, color: Colors.white),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(25),
-            borderSide: BorderSide(color: Color.fromARGB(255, 201, 194, 191)),
+            borderSide: BorderSide(color: Colors.white),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(25),
-            borderSide: BorderSide(color: Color.fromARGB(255, 201, 194, 191)),
+            borderSide: BorderSide(color: Colors.white),
           ),
         ),
       ),

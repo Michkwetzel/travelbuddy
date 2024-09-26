@@ -2,13 +2,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:front_travelbuddy/change_notifiers/chat_state_provider.dart';
 import 'package:front_travelbuddy/change_notifiers/fire_base_stream_provider.dart';
-import 'package:front_travelbuddy/change_notifiers/spinner.dart';
 import 'package:front_travelbuddy/screens/welcome_screen.dart';
 import 'package:front_travelbuddy/services/auth_service.dart';
 import 'package:front_travelbuddy/services/back_end_service.dart';
 import 'package:front_travelbuddy/services/firestore_service.dart';
 import 'package:front_travelbuddy/widgets/widgets.dart';
-import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
+import 'package:front_travelbuddy/widgets/widgets_chat_screen.dart';
 import 'package:provider/provider.dart';
 import 'dart:core';
 
@@ -21,20 +20,18 @@ class ChatbotScreen extends StatefulWidget {
 
 class _ChatbotScreenState extends State<ChatbotScreen> with SingleTickerProviderStateMixin {
   bool isDrawerOpen = false;
-  String userMessage = '';
   final messageTextController = TextEditingController();
-  late BackEndService backEndService;
-  late FireStoreStreamProvider streamProvider;
-  late ChatStateProvider chatStateProvider;
   late AnimationController drawerController;
-  late AuthService authService;
 
   void toggleDrawer() {
-    if (drawerController.isCompleted) {
-      drawerController.reverse();
-    } else {
-      drawerController.forward();
-    }
+    setState(() {
+      isDrawerOpen = !isDrawerOpen;
+      if (isDrawerOpen) {
+        drawerController.forward();
+      } else {
+        drawerController.reverse();
+      }
+    });
   }
 
   @override
@@ -49,137 +46,79 @@ class _ChatbotScreenState extends State<ChatbotScreen> with SingleTickerProvider
   @override
   void dispose() {
     drawerController.dispose();
+    messageTextController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    backEndService = Provider.of<BackEndService>(context, listen: false);
-    streamProvider = Provider.of<FireStoreStreamProvider>(context);
-    chatStateProvider = Provider.of<ChatStateProvider>(context);
-    authService = Provider.of<AuthService>(context);
-
+    final Size size = MediaQuery.of(context).size;
     return Scaffold(
-      appBar: AppBar(
-          title: Stack(
-            children: [
-              Align(
-                alignment: Alignment.centerLeft,
-                child: SizedBox(
-                    width: 150,
-                    child: Text(
-                      chatStateProvider.currentChatroomName,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    )),
-              ),
-              Align(
-                alignment: Alignment.center,
-                child: Text("Travel Buddy")),
-            ],
+      body: Stack(
+        children: [
+          // Background Image
+          Image.asset(
+            'assets/background/chatscreen_jungle.jpg',
+            fit: BoxFit.cover,
+            width: size.width,
+            height: size.height,
           ),
-          leading: IconButton(
-            icon: Icon(Icons.menu),
-            onPressed: toggleDrawer,
-          )),
-      body: ModalProgressHUD(
-        inAsyncCall: Provider.of<Spinner>(context).spinner,
-        child: Row(
-          children: [
-            ChatRoomDrawer(
-              isDrawerOpen: isDrawerOpen,
-              controller: drawerController,
-              backEndService: backEndService,
-              chatStateProvider: chatStateProvider,
-              streamProvider: streamProvider,
-              authService: authService,
-            ),
-            SizedBox(
-              width: 150,
-            ),
-            Expanded(
-              child: Column(
-                //Main Chat Tab
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  StreamBuilder(
-                      stream: streamProvider.messageStream,
-                      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                        try {
-                          if (snapshot.hasError) {
-                            return const Text('Something went wrong');
-                          }
-
-                          if (snapshot.connectionState == ConnectionState.waiting || !snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                            return const Text("Loading");
-                          }
-
-                          final messages = snapshot.data!.docs;
-                          List<MessageBuble> messageWidgets = [];
-                          for (var message in messages) {
-                            Map<String, dynamic> data = message.data() as Map<String, dynamic>;
-                            final text = data['message'];
-                            final role = data['role'];
-                            final messageWidget = MessageBuble(message: text, sender: role);
-                            messageWidgets.add(messageWidget);
-                          }
-                          return Expanded(
-                            child: ListView(
-                              reverse: true,
-                              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 20),
-                              children: messageWidgets,
-                            ),
-                          );
-                        } on Exception {
-                          return const Text("Loading");
-                        }
-                      }),
-                  Column(children: [
-                    Container(
-                      child: Row(
-                        // Bottom Textfield
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Expanded(
-                            child: TextField(
-                              controller: messageTextController,
-                              decoration: InputDecoration(
-                                contentPadding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
-                                hintText: 'Type your message here...',
-                                border: OutlineInputBorder(borderSide: BorderSide(), borderRadius: BorderRadius.circular(20)),
-                              ),
-                              onChanged: (value) {
-                                userMessage = value;
-                              },
-                            ),
-                          ),
-                          IconButton(
-                              onPressed: () {
-                                messageTextController.clear();
-                                try {
-                                  backEndService.sendMessage(chatRoomID: chatStateProvider.currentChat, userMessage: userMessage);
-                                } catch (e) {
-                                  print(e);
-                                }
-                                ;
-                              },
-                              icon: Icon(Icons.send)),
-                        ],
-                      ),
-                    ),
-                    SizedBox(
-                      height: 10,
-                    )
-                  ])
-                ],
+          // App Bar
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: AppBarChatScreen(toggleDrawer: toggleDrawer),
+          ),
+          // Centered Message Display
+          Positioned.fill(
+            top: kToolbarHeight,
+            child: Align(
+              alignment: Alignment.topCenter,
+              child: SizedBox(
+                width: 700,
+                child: MessageDisplayWidget(messageTextController: messageTextController),
               ),
             ),
-            SizedBox(
-              width: 50,
-            ),
-          ],
-        ),
+          ),
+          // Drawer
+          AnimatedBuilder(
+            animation: drawerController,
+            builder: (context, child) {
+              var drawerColor = Colors.black.withOpacity(0);
+              if (size.width < 1024){
+                drawerColor = Colors.black.withOpacity(0.4);
+              }
+
+              return Container(
+                color: drawerColor,
+                child: Stack(
+                  children: [
+                    ChatRoomDrawer(
+                      isDrawerOpen: isDrawerOpen,
+                      controller: drawerController,
+                      size: size,
+                    ),
+                    Positioned(
+                      top: 0,
+                      left: 0,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.3, vertical: 8),
+                        child: Container(
+                          decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: Colors.white),
+                          child: IconButton(
+                            icon: const Icon(Icons.menu),
+                            onPressed: () => toggleDrawer(),
+                          ),
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              );
+            },
+          ),
+        ],
       ),
     );
   }
@@ -189,33 +128,40 @@ class ChatRoomDrawer extends StatelessWidget {
   const ChatRoomDrawer({
     super.key,
     required this.isDrawerOpen,
-    required this.backEndService,
-    required this.chatStateProvider,
-    required this.streamProvider,
     required this.controller,
-    required this.authService,
+    required this.size,
   });
 
   final bool isDrawerOpen;
-  final BackEndService backEndService;
-  final ChatStateProvider chatStateProvider;
-  final FireStoreStreamProvider streamProvider;
   final AnimationController controller;
-  final AuthService authService;
+  final Size size;
+
 
   @override
   Widget build(BuildContext context) {
+    BackEndService backEndService = Provider.of<BackEndService>(context);
+    ChatStateProvider chatStateProvider = Provider.of<ChatStateProvider>(context);
+    FireStoreStreamProvider streamProvider = Provider.of<FireStoreStreamProvider>(context);
+    AuthService authService = Provider.of<AuthService>(context);
+
     return AnimatedBuilder(
       animation: controller,
       builder: (context, child) {
         return Container(
-          width: 200 * controller.value,
-          color: Colors.blue[100],
+          width: 170 * controller.value,
+          color: Colors.white.withOpacity(0),
           child: Column(
             children: [
+              SizedBox(
+                height: 55,
+              ),
               DrawerFunctionButton(
                   text: 'New Chat',
-                  icon: Icon(Icons.chat),
+                  icon: Icon(
+                    Icons.add,
+                    size: 20,
+                    color: Colors.black87,
+                  ),
                   controller: controller,
                   onTap: () async {
                     String chatRoomID = await backEndService.createNewChatroom();
@@ -223,14 +169,18 @@ class ChatRoomDrawer extends StatelessWidget {
                     chatStateProvider.setCurrentChatroom(chatRoomID);
                     streamProvider.updateMessageStream();
                   }),
-              ChatRoomStreamBuilder(streamProvider: streamProvider, chatStateProvider: chatStateProvider, controller: controller),
+              ChatRoomStreamBuilder(controller: controller),
               DrawerFunctionButton(
                   controller: controller,
                   onTap: () => authService.signOut(
                         () => Navigator.push(context, MaterialPageRoute(builder: (context) => WelcomeScreen())),
                       ),
-                  icon: Icon(Icons.logout),
+                  icon: Icon(
+                    Icons.logout,
+                    size: 20,
+                  ),
                   text: 'Log Out'),
+              SizedBox(height: 10)
             ],
           ),
         );
@@ -242,17 +192,16 @@ class ChatRoomDrawer extends StatelessWidget {
 class ChatRoomStreamBuilder extends StatelessWidget {
   const ChatRoomStreamBuilder({
     super.key,
-    required this.streamProvider,
-    required this.chatStateProvider,
     required this.controller,
   });
 
-  final FireStoreStreamProvider streamProvider;
-  final ChatStateProvider chatStateProvider;
   final AnimationController controller;
 
   @override
   Widget build(BuildContext context) {
+    FireStoreStreamProvider streamProvider = Provider.of<FireStoreStreamProvider>(context);
+    ChatStateProvider chatStateProvider = Provider.of<ChatStateProvider>(context);
+
     return Flexible(
       child: StreamBuilder(
           stream: streamProvider.chatRoomStream,
@@ -276,7 +225,7 @@ class ChatRoomStreamBuilder extends StatelessWidget {
                 String chatroomID = chat.id;
                 chatTiles.add(ChatRoomButton(
                   controller: controller,
-                  icon: Icons.ac_unit,
+                  icon: Icons.chat_bubble_outline,
                   text: chatDescription,
                   chatroomID: chatroomID,
                   onTap: () {
@@ -317,11 +266,12 @@ class DrawerFunctionButton extends StatelessWidget {
                     softWrap: false,
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400, color: Colors.black, decoration: TextDecoration.none, fontFamily: 'Roboto'),
                   ),
                   onPressed: onTap,
                   style: TextButton.styleFrom(
+                    backgroundColor: Colors.white,
                     alignment: Alignment.centerLeft,
-                    padding: const EdgeInsets.symmetric(horizontal: 30),
                   ),
                 ),
               );
@@ -372,24 +322,35 @@ class _ChatRoomButtonState extends State<ChatRoomButton> {
               onExit: (event) => setState(() => _isHovered = false),
               child: Row(children: [
                 Expanded(
-                  child: TextButton.icon(
-                    icon: Icon(widget.icon),
-                    label: Text(
-                      widget.text,
-                      softWrap: false,
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
-                    ),
-                    onPressed: widget.onTap,
-                    style: TextButton.styleFrom(
-                      alignment: Alignment.centerLeft,
-                      padding: const EdgeInsets.only(right: 16, left: 10),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: TextButton.icon(
+                      icon: Icon(widget.icon, color: Colors.black),
+                      label: Text(
+                        widget.text,
+                        softWrap: false,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                        style: TextStyle(color: Colors.black, fontFamily: 'Roboto', fontWeight: FontWeight.w400, fontSize: 13),
+                      ),
+                      onPressed: widget.onTap,
+                      style: TextButton.styleFrom(
+                        fixedSize: Size(double.infinity, 37),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        alignment: Alignment.centerLeft,
+                        padding: const EdgeInsets.only(right: 16, left: 10),
+                        backgroundColor: Colors.white,
+                        overlayColor: Colors.white,
+                      ),
                     ),
                   ),
                 ),
                 if (_isHovered)
                   PopupMenuButton<String>(
                     icon: Icon(
+                      color: Colors.white,
                       Icons.more_vert,
                       size: 20,
                     ),
@@ -424,40 +385,6 @@ class _ChatRoomButtonState extends State<ChatRoomButton> {
             );
           },
         ),
-      ),
-    );
-  }
-}
-
-class MessageBuble extends StatelessWidget {
-  const MessageBuble({required this.message, required this.sender, super.key});
-
-  final String message;
-  final String sender;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 10),
-      child: Column(
-        crossAxisAlignment: sender == 'assistant' ? CrossAxisAlignment.start : CrossAxisAlignment.end,
-        children: [
-          Text(
-            sender,
-            style: TextStyle(fontSize: 10, color: Colors.black),
-          ),
-          Material(
-            borderRadius: BorderRadius.circular(20),
-            elevation: 7,
-            color: Colors.blue,
-            child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-                child: Text(
-                  message,
-                  style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w500),
-                )),
-          ),
-        ],
       ),
     );
   }
