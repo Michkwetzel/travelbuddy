@@ -67,7 +67,7 @@ class GoogleSignInButton extends StatelessWidget {
             SizedBox(
               width: 6,
             ),
-            Text('Sign in with Google', style: TextStyle(fontSize: 14, fontFamily: 'Roboto', fontWeight: FontWeight.w100, color: Colors.black87),)
+            Text('Sign in with Google', style: TextStyle(fontSize: 14, fontFamily: 'Roboto', fontWeight: FontWeight.w400, color: Colors.black87),)
           ],
         ),
       ),
