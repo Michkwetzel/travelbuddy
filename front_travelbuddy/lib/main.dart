@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:front_travelbuddy/change_notifiers/chat_history_provider.dart';
 import 'package:front_travelbuddy/change_notifiers/chat_state_provider.dart';
 import 'package:front_travelbuddy/change_notifiers/spinner.dart';
 import 'package:front_travelbuddy/change_notifiers/fire_base_stream_provider.dart';
@@ -25,6 +26,7 @@ void main() async {
         ChangeNotifierProvider(create: (context) => ChatStateProvider()),
         ChangeNotifierProvider(create: (context) => UserModel()),
         ChangeNotifierProvider(create: (context) => Spinner()),
+        ChangeNotifierProvider(create: (context) => ChatHistoryProvider()),
         Provider(
           create: (context) => HttpService(),
         ),
@@ -35,6 +37,7 @@ void main() async {
                 )),
         Provider(
             create: (context) => BackEndService(
+                  chatHistoryProvider: context.read<ChatHistoryProvider>(),
                   chatStateProvider: context.read<ChatStateProvider>(),
                   userModel: context.read<UserModel>(),
                   http: context.read<HttpService>(),

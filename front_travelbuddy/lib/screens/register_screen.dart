@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:front_travelbuddy/screens/chatbot_screen.dart';
 import 'package:front_travelbuddy/widgets/widgets.dart';
@@ -83,6 +84,8 @@ class LogInScreenCopy extends StatefulWidget {
 class _LogInScreenCopyState extends State<LogInScreenCopy> {
   String userEmail = '';
   String userPassword = '';
+  String errorText = '';
+  bool error = false;
 
   void emailVertificationDialog(BuildContext context, String message) {
     // Implement your email verification dialog here
@@ -91,11 +94,37 @@ class _LogInScreenCopyState extends State<LogInScreenCopy> {
   @override
   Widget build(BuildContext context) {
     void createAccount() async {
-      await Provider.of<AuthService>(context, listen: false).createUserWithEmailAndPassword(
-        userEmail: userEmail,
-        userPassword: userPassword,
-        emailVerificationPopUp: () => emailVertificationDialog(context, 'A verification link has been sent to your email.\nPlease verify your account and log in.'),
-      );
+      try {
+        await Provider.of<AuthService>(context, listen: false).createUserWithEmailAndPassword(
+          userEmail: userEmail,
+          userPassword: userPassword,
+          emailVerificationPopUp: () => emailVertificationDialog(context, 'A verification link has been sent to your email.\nPlease verify your account and log in.'),
+        );
+      } on FirebaseAuthException catch (e) {
+        String errorMessage = 'Invalid';
+        if (e.code == 'email-already-in-use') {
+          errorMessage = 'Email already in use';
+        }
+        if (e.code == 'invalid-email') {
+          errorMessage = 'Invalid email';
+        }
+        if (e.code == 'network-request-failed') {
+          errorMessage = 'Connection lost';
+        }
+        if (e.code == 'weak-password') {
+          errorMessage = 'Weak Password';
+        }
+        setState(() {
+          error = true;
+          errorText = errorMessage;
+        });
+      } catch (e) {
+        print(e);
+        setState(() {
+          error = true;
+        });
+        print('Error: $e');
+      }
     }
 
     return Scaffold(
@@ -175,13 +204,36 @@ class _LogInScreenCopyState extends State<LogInScreenCopy> {
                           ),
                         ),
                         SizedBox(
-                            width: 500,
-                            height: 48,
-                            child: LogInTextfield(
-                                onChanged: (value) {
-                                  userEmail = value;
-                                },
-                                onSubmit: () => createAccount())),
+                          width: 500,
+                          height: 48,
+                          child: LogInTextfield(error: error ,onChanged: (value) {
+                            userEmail = value;
+                          }, onSubmit: () {
+                            setState(() {
+                              error = false;
+                            });
+                            createAccount();
+                          }),
+                        ),
+                        if (error)
+                          Container(
+                            height: 25,
+                            width: 170,
+                            decoration: BoxDecoration(
+                              image: DecorationImage(
+                                opacity: 0.89,
+                                colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                                fit: BoxFit.fill,
+                                image: AssetImage('assets/brush_strokes/blue_2.png'),
+                              ),
+                            ),
+                            child: Center(
+                              child: Text(
+                                errorText,
+                                style: TextStyle(color: Colors.red[300], fontSize: 13, fontWeight: FontWeight.w300),
+                              ),
+                            ),
+                          ),
                         Container(
                           height: 40,
                           width: 100,
@@ -205,6 +257,7 @@ class _LogInScreenCopyState extends State<LogInScreenCopy> {
                             width: 500,
                             height: 48,
                             child: LogInTextfield(
+                              error: error,
                               onChanged: (value) {
                                 userPassword = value;
                               },
@@ -244,8 +297,9 @@ class _LogInScreenCopyState extends State<LogInScreenCopy> {
 class LogInTextfield extends StatefulWidget {
   final Function(String) onChanged;
   final VoidCallback onSubmit;
+  final bool error;
 
-  const LogInTextfield({Key? key, required this.onChanged, required this.onSubmit}) : super(key: key);
+  const LogInTextfield({Key? key, required this.onChanged, required this.onSubmit, required this.error}) : super(key: key);
 
   @override
   _LogInTextfield createState() => _LogInTextfield();
@@ -298,15 +352,15 @@ class _LogInTextfield extends State<LogInTextfield> {
           focusColor: Colors.white.withOpacity(0.85),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(25),
-            borderSide: BorderSide(width: 0.1, color: Colors.white),
+            borderSide: BorderSide(width: 0.1, color: widget.error ? Colors.red[300]! : Colors.white),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(25),
-            borderSide: BorderSide(color: Colors.white),
+            borderSide: BorderSide(color: widget.error ? Colors.red[300]! : Colors.white),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(25),
-            borderSide: BorderSide(color: Colors.white),
+            borderSide: BorderSide(color: widget.error ? Colors.red[300]! : Colors.white),
           ),
         ),
       ),

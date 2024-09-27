@@ -1,21 +1,18 @@
-from services.firestore_service import FirestoreService
+import vertexai
+from vertexai.generative_models import GenerativeModel
 
-firestore = FirestoreService()
+# TODO(developer): Update project & location
+vertexai.init(project='travelai-88a07', location='us-west3')
 
-# Get user data from user UID.
-uid = "yr2783ghfehide"
+# using Vertex AI Model as tokenzier
+model = GenerativeModel("gemini-1.5-flash")
 
-#print(firestore.get_doc("users", uid))
+prompt = "hello world"
+response = model.count_tokens(prompt)
+print(f"Prompt Token Count: {response.total_tokens}")
+print(f"Prompt Character Count: {response.total_billable_characters}")
 
-# add a user
-
-#newUserUID = "TestNewRules"
-#doc_id = firestore.add_doc("users", {'age': '33', 'last': 'Jell', 'destination': 'Sri Lanka', 'passport': 'south african', 'email': 'random@gmail.com', 'first': 'Ben', 'location': "new zealand"}, newUserUID)
-#print(doc_id)
-
-#print(firestore.get_doc(doc_path='users/6A1fdmwR5mKjrCEcQ7ZB/chats/Chat1/messages', doc_id='2024-07-31-10-49-50'))
-print(firestore.add_doc(doc_path='users/6A1fdmwR5mKjrCEcQ7ZB/chats/Chat1/messages', doc_id='2024-07-31-10-49-55', fields_dict={'hi': 'hi'}))
-
-firestore.add_doc(doc_path='users')
-
-#firestore.get_message()
+prompt = ["hello world", "what's the weather today"]
+response = model.count_tokens(prompt)
+print(f"Prompt Token Count: {response.total_tokens}")
+print(f"Prompt Character Count: {response.total_billable_characters}")

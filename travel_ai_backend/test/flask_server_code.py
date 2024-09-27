@@ -88,6 +88,7 @@ def receive_user_message():
         user_id = request_body.get('userID')
         chatroom_id = request_body.get('chatroomID')
         message = request_body.get('message')
+        chat_history = request_body.get('chatHistory')
         timestamp = datetime.datetime.now()
 
         user_message_entry = {'message': message, 'role': 'user', 'timestamp': timestamp}
@@ -99,9 +100,18 @@ def receive_user_message():
 
         firestore.update_chatroom_latest_timestamp(user_id=user_id, chatroom_id=chatroom_id, timestamp=timestamp)
 
-        message += "**Note** Before this sentance is what the user requested. Note you are a travel agent so act in a travel agent way. expect the user to ask travel questions"
+        final_message = "System prompt: You are given chat history and user request. You are a travel agent helping the user with travel related enquiries, respond accordingly. Here is chathistory: "
+        chat_history.reverse()
+        for entry in chat_history:
+            final_message += f'{entry}\n'
 
-        llm_response = chat_bot.send_Request(message)
+        final_message += f'Here is user request: {message}'
+        print(final_message)
+
+        llm_response = chat_bot.send_Request(final_message)
+        # output_tokens = chat_bot.count_tokens(llm_response)
+        # print(f'Output tokens: {output_tokens}')
+
         timestamp = datetime.datetime.now()
         llm_message_entry = {
              'message': llm_response,
