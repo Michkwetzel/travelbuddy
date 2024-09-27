@@ -37,7 +37,7 @@ class AuthService {
         } else {
           userModel.setUser(user.uid);
           fireStoreService.getAndSetChatroomAtIndex(chatroomIndex: 0);
-          
+
           final userID = user.uid;
           print('User Change signalled - UserID: $userID');
           // Additional actions for sign-in (e.g., fetch user profile)
@@ -53,16 +53,11 @@ class AuthService {
     required Function() emailVerificationPopUp,
   }) async {
     dynamic newUserCred;
-    try {
-      newUserCred = await _auth.createUserWithEmailAndPassword(email: userEmail, password: userPassword);
-      _auth.currentUser?.sendEmailVerification();
-      emailVerificationPopUp();
-      await _auth.signOut();
-      return newUserCred;
-    } catch (e) {
-      print('error: $e');
-      return null;
-    }
+    newUserCred = await _auth.createUserWithEmailAndPassword(email: userEmail, password: userPassword);
+    _auth.currentUser?.sendEmailVerification();
+    emailVerificationPopUp();
+    await _auth.signOut();
+    return newUserCred;
   }
 
   Future<UserCredential?> signInWithGoogle({Function? nextScreenCall}) async {
@@ -103,32 +98,23 @@ class AuthService {
     // Checks if user email is verified. Also checks if user profile exists on DB.
     //if not, sends request to backend to add new user. This is for first time sign in.
 
-    try {
-      spinner.showSpinner();
-      var userCred = await _auth.signInWithEmailAndPassword(email: userEmail, password: userPassword);
-      bool emailVerified = userCred.user!.emailVerified;
+    var userCred = await _auth.signInWithEmailAndPassword(email: userEmail, password: userPassword);
+    bool emailVerified = userCred.user!.emailVerified;
 
-      if (emailVerified) {
-        if (await fireStoreService.doesUserProfileExist(userCred.user!.uid)) {
-          print('Checked if user profile exists');
-          fireStoreStreamProvider.userChangeStreamUpdate();
-          spinner.hideSpinner();
-          nextScreenCall?.call();
-        } else {
-          await backEndService.addNewUser(userCred: userCred);
-          fireStoreStreamProvider.userChangeStreamUpdate();
-          spinner.hideSpinner();
-          nextScreenCall?.call();
-        }
+    if (emailVerified) {
+      if (await fireStoreService.doesUserProfileExist(userCred.user!.uid)) {
+        print('Checked if user profile exists');
+        fireStoreStreamProvider.userChangeStreamUpdate();
+        nextScreenCall?.call();
       } else {
-        spinner.hideSpinner();
-        emailVerificationPopUp();
-        await _auth.currentUser!.sendEmailVerification();
-        _auth.signOut();
+        await backEndService.addNewUser(userCred: userCred);
+        fireStoreStreamProvider.userChangeStreamUpdate();
+        nextScreenCall?.call();
       }
-    } on Exception catch (e) {
-      spinner.hideSpinner();
-      print(e);
+    } else {
+      emailVerificationPopUp();
+      await _auth.currentUser!.sendEmailVerification();
+      _auth.signOut();
     }
   }
 

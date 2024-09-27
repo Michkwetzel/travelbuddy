@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:front_travelbuddy/change_notifiers/chat_history_provider.dart';
 import 'package:front_travelbuddy/change_notifiers/chat_state_provider.dart';
 import 'package:front_travelbuddy/change_notifiers/spinner.dart';
 import 'package:front_travelbuddy/change_notifiers/user_model.dart';
@@ -12,9 +13,10 @@ class BackEndService {
   final Spinner spinner;
   final FireStoreService fireStoreService;
   ChatStateProvider chatStateProvider;
+  ChatHistoryProvider chatHistoryProvider;
   UserModel userModel;
 
-  BackEndService({required this.userModel, required this.http, required this.spinner, required this.fireStoreService, required this.chatStateProvider});
+  BackEndService({required this.userModel, required this.http, required this.spinner, required this.fireStoreService, required this.chatStateProvider, required this.chatHistoryProvider});
 
   /// send DB write request to backend. Must include collection and data.
   /// if docID empty then google will assign doc random docID
@@ -108,9 +110,10 @@ class BackEndService {
   Future<String> sendMessage({required String chatRoomID, required String userMessage}) async {
     try {
       String userID = userModel.currentUser;
+      List<String> chatHistory = chatHistoryProvider.chatHistory;
       print('Send message called for user $userID');
 
-      Map<String, dynamic> request = {'userID': userID, 'chatroomID': chatRoomID, 'message': userMessage};
+      Map<String, dynamic> request = {'userID': userID, 'chatroomID': chatRoomID, 'message': userMessage, 'chatHistory': chatHistory};
 
       var response = await http.postRequest(path: '/receive_user_massage', request: request);
       var log = response.body;

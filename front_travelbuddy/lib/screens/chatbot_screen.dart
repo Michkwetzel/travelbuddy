@@ -86,7 +86,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> with SingleTickerProvider
             animation: drawerController,
             builder: (context, child) {
               var drawerColor = Colors.black.withOpacity(0);
-              if (size.width < 1024){
+              if (size.width < 1024) {
                 drawerColor = Colors.black.withOpacity(0.4);
               }
 
@@ -136,7 +136,6 @@ class ChatRoomDrawer extends StatelessWidget {
   final AnimationController controller;
   final Size size;
 
-
   @override
   Widget build(BuildContext context) {
     BackEndService backEndService = Provider.of<BackEndService>(context);
@@ -148,38 +147,47 @@ class ChatRoomDrawer extends StatelessWidget {
       animation: controller,
       builder: (context, child) {
         return Container(
-          width: 170 * controller.value,
+          width: 205 * controller.value,
           color: Colors.white.withOpacity(0),
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(
                 height: 55,
               ),
-              DrawerFunctionButton(
-                  text: 'New Chat',
-                  icon: Icon(
-                    Icons.add,
-                    size: 20,
-                    color: Colors.black87,
-                  ),
-                  controller: controller,
-                  onTap: () async {
-                    String chatRoomID = await backEndService.createNewChatroom();
-                    chatStateProvider.setCurrentChatroomName('New chatroom');
-                    chatStateProvider.setCurrentChatroom(chatRoomID);
-                    streamProvider.updateMessageStream();
-                  }),
+              Padding(
+                padding: EdgeInsets.only(left: 29.6, bottom: 5),
+                child: DrawerFunctionButton(
+                    text: 'New Chat',
+                    icon: Icon(
+                      Icons.add,
+                      size: 20,
+                      color: Colors.black87,
+                    ),
+                    controller: controller,
+                    onTap: () async {
+                      String chatRoomID = await backEndService.createNewChatroom();
+                      chatStateProvider.setCurrentChatroomName('New chatroom');
+                      chatStateProvider.setCurrentChatroom(chatRoomID);
+                      streamProvider.updateMessageStream();
+                    }),
+              ),
+
               ChatRoomStreamBuilder(controller: controller),
-              DrawerFunctionButton(
-                  controller: controller,
-                  onTap: () => authService.signOut(
-                        () => Navigator.push(context, MaterialPageRoute(builder: (context) => WelcomeScreen())),
-                      ),
-                  icon: Icon(
-                    Icons.logout,
-                    size: 20,
-                  ),
-                  text: 'Log Out'),
+              Padding(
+                padding: const EdgeInsets.only(left: 35.75),
+                child: DrawerFunctionButton(
+                    controller: controller,
+                    onTap: () => authService.signOut(
+                          () => Navigator.push(context, MaterialPageRoute(builder: (context) => WelcomeScreen())),
+                        ),
+                    icon: Icon(
+                      Icons.logout,
+                      size: 20,
+                    ),
+                    text: 'Log Out'),
+              ),
               SizedBox(height: 10)
             ],
           ),
@@ -253,26 +261,24 @@ class DrawerFunctionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      constraints: BoxConstraints(minHeight: 50),
+      constraints: BoxConstraints(minHeight: 35),
       child: ClipRect(
         child: AnimatedBuilder(
             animation: controller,
             builder: (context, child) {
-              return Align(
-                child: TextButton.icon(
-                  icon: icon,
-                  label: Text(
-                    text,
-                    softWrap: false,
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400, color: Colors.black, decoration: TextDecoration.none, fontFamily: 'Roboto'),
-                  ),
-                  onPressed: onTap,
-                  style: TextButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    alignment: Alignment.centerLeft,
-                  ),
+              return TextButton.icon(
+                icon: icon,
+                label: Text(
+                  text,
+                  softWrap: false,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400, color: Colors.black, decoration: TextDecoration.none, fontFamily: 'Roboto'),
+                ),
+                onPressed: onTap,
+                style: TextButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  alignment: Alignment.centerLeft,
                 ),
               );
             }),
@@ -317,72 +323,67 @@ class _ChatRoomButtonState extends State<ChatRoomButton> {
           animation: widget.controller,
           builder: (context, child) {
             BuildContext dialogContext = context;
-            return MouseRegion(
-              onEnter: (event) => setState(() => _isHovered = true),
-              onExit: (event) => setState(() => _isHovered = false),
-              child: Row(children: [
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    child: TextButton.icon(
-                      icon: Icon(widget.icon, color: Colors.black),
-                      label: Text(
-                        widget.text,
-                        softWrap: false,
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                        style: TextStyle(color: Colors.black, fontFamily: 'Roboto', fontWeight: FontWeight.w400, fontSize: 13),
+            return Row(children: [
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 12),
+                  child: TextButton.icon(
+                    icon: Icon(widget.icon, color: Colors.black),
+                    label: Text(
+                      widget.text,
+                      softWrap: false,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                      style: TextStyle(color: Colors.black, fontFamily: 'Roboto', fontWeight: FontWeight.w400, fontSize: 13),
+                    ),
+                    onPressed: widget.onTap,
+                    style: TextButton.styleFrom(
+                      fixedSize: Size(double.infinity, 37),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
                       ),
-                      onPressed: widget.onTap,
-                      style: TextButton.styleFrom(
-                        fixedSize: Size(double.infinity, 37),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        alignment: Alignment.centerLeft,
-                        padding: const EdgeInsets.only(right: 16, left: 10),
-                        backgroundColor: Colors.white,
-                        overlayColor: Colors.white,
-                      ),
+                      alignment: Alignment.centerLeft,
+                      padding: const EdgeInsets.only(right: 16, left: 10),
+                      backgroundColor: Colors.white,
+                      overlayColor: Colors.white,
                     ),
                   ),
                 ),
-                if (_isHovered)
-                  PopupMenuButton<String>(
-                    icon: Icon(
-                      color: Colors.white,
-                      Icons.more_vert,
-                      size: 20,
-                    ),
-                    itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                      PopupMenuItem<String>(
-                        child: Text('Delete Chat'),
-                        value: 'delete',
-                        onTap: () {
-                          if (widget.chatroomID == chatStateProvider.currentChat) {
-                            fireStoreService.getAndSetChatroomAtIndex(justDeletedChat: true);
-                          }
-                          backEndService.deleteChatroom(chatroomID: widget.chatroomID);
-                        },
-                      ),
-                      PopupMenuItem<String>(
-                        child: Text('Rename Chat'),
-                        value: 'rename',
-                        onTap: () {
-                          editChatDescriptionDialogue(
-                            dialogContext,
-                            widget.text,
-                            (newDescription) => backEndService.editChatroomDescription(
-                              chatroomID: widget.chatroomID,
-                              newDescription: newDescription,
-                            ),
-                          );
-                        },
-                      ),
-                    ],
-                  )
-              ]),
-            );
+              ),
+              PopupMenuButton<String>(
+                icon: Icon(
+                  color: Colors.white,
+                  Icons.more_vert,
+                  size: 20,
+                ),
+                itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                  PopupMenuItem<String>(
+                    child: Text('Delete Chat'),
+                    value: 'delete',
+                    onTap: () {
+                      if (widget.chatroomID == chatStateProvider.currentChat) {
+                        fireStoreService.getAndSetChatroomAtIndex(justDeletedChat: true);
+                      }
+                      backEndService.deleteChatroom(chatroomID: widget.chatroomID);
+                    },
+                  ),
+                  PopupMenuItem<String>(
+                    child: Text('Rename Chat'),
+                    value: 'rename',
+                    onTap: () {
+                      editChatDescriptionDialogue(
+                        dialogContext,
+                        widget.text,
+                        (newDescription) => backEndService.editChatroomDescription(
+                          chatroomID: widget.chatroomID,
+                          newDescription: newDescription,
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              )
+            ]);
           },
         ),
       ),

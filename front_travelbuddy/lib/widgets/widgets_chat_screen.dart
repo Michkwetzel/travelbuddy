@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:front_travelbuddy/change_notifiers/chat_history_provider.dart';
 import 'package:front_travelbuddy/change_notifiers/chat_state_provider.dart';
 import 'package:front_travelbuddy/change_notifiers/fire_base_stream_provider.dart';
 import 'package:front_travelbuddy/services/back_end_service.dart';
@@ -162,6 +163,8 @@ class MessageDisplayWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     FireStoreStreamProvider streamProvider = Provider.of<FireStoreStreamProvider>(context);
+    ChatHistoryProvider chatHistoryProvider = Provider.of<ChatHistoryProvider>(context);
+
 
     return Column(
       //Main Chat Tab
@@ -179,6 +182,8 @@ class MessageDisplayWidget extends StatelessWidget {
                   return const Text("Loading");
                 }
 
+                List<String> messageHistory = [];
+
                 final messages = snapshot.data!.docs;
                 List<MessageBuble> messageWidgets = [];
                 for (var message in messages) {
@@ -186,8 +191,11 @@ class MessageDisplayWidget extends StatelessWidget {
                   final text = data['message'];
                   final role = data['role'];
                   final messageWidget = MessageBuble(message: text, sender: role);
+                  messageHistory.add('role: $role, message: $text');
                   messageWidgets.add(messageWidget);
                 }
+                chatHistoryProvider.setHistory(messageHistory);
+
                 return Expanded(
                   child: ListView(
                     reverse: true,

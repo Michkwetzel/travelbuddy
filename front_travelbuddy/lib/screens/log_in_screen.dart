@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:provider/provider.dart';
@@ -17,6 +18,8 @@ class LogInScreen extends StatefulWidget {
 class _LogInScreenState extends State<LogInScreen> {
   String userEmail = '';
   String userPassword = '';
+  String errorText = '';
+  bool error = false;
   final http = HttpService();
 
   @override
@@ -24,12 +27,37 @@ class _LogInScreenState extends State<LogInScreen> {
     //provide spinner callback to authService
 
     void logIn() async {
-      await Provider.of<AuthService>(context, listen: false).signInWithEmailAndPassword(
-        userEmail: userEmail,
-        userPassword: userPassword,
-        emailVerificationPopUp: () => emailVertificationDialog(context, 'Another verification link has been sent to your email.\nPlease verify your account and log in.'),
-        nextScreenCall: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ChatbotScreen())),
-      );
+      try {
+        await Provider.of<AuthService>(context, listen: false).signInWithEmailAndPassword(
+          userEmail: userEmail,
+          userPassword: userPassword,
+          emailVerificationPopUp: () => emailVertificationDialog(context, 'Another verification link has been sent to your email.\nPlease verify your account and log in.'),
+          nextScreenCall: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ChatbotScreen())),
+        );
+      } on FirebaseAuthException catch (e) {
+        String errorMessage = 'Invalid';
+        if (e.code == 'user-not-found') {
+          errorMessage = "Wrong email";
+        }
+        if (e.code == 'wrong-password' || e.code == 'INVALID_LOGIN_CREDENTIALS' || e.code == 'invalid-credential') {
+          errorMessage = "Wrong password";
+        }
+        if (e.code == 'invalid-email') {
+          errorMessage = "Invalid email";
+        }
+        if (e.code == 'network-request-failed') {
+          errorMessage = "Connection lost";
+        }
+        setState(() {
+          error = true;
+          errorText = errorMessage;
+        });
+      } catch (e) {
+        setState(() {
+          error = true;
+        });
+        print('Error: $e');
+      }
     }
 
     return Scaffold(
@@ -123,7 +151,28 @@ class _LogInScreenState extends State<LogInScreen> {
                           userEmail = value;
                         },
                         onSubmit: () => logIn(),
+                        error: error,
+                        errorText: errorText,
                       )),
+                  if (error)
+                    Container(
+                      height: 25,
+                      width: 120,
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          opacity: 0.89,
+                          colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                          fit: BoxFit.fill,
+                          image: AssetImage('assets/brush_strokes/blue_2.png'),
+                        ),
+                      ),
+                      child: Center(
+                        child: Text(
+                          errorText,
+                          style: TextStyle(color: Colors.red[300], fontSize: 13, fontWeight: FontWeight.w300),
+                        ),
+                      ),
+                    ),
                   Container(
                     height: 40,
                     width: 100,
@@ -147,10 +196,17 @@ class _LogInScreenState extends State<LogInScreen> {
                       width: 500,
                       height: 48,
                       child: LogInTextfield(
+                        error: error,
+                        errorText: errorText,
                         onChanged: (value) {
                           userPassword = value;
                         },
-                        onSubmit: () => logIn(),
+                        onSubmit: () {
+                          setState(() {
+                            error = false;
+                          });
+                          logIn();
+                        },
                       )),
                   SizedBox(
                     height: 20,
@@ -183,8 +239,10 @@ class _LogInScreenState extends State<LogInScreen> {
 class LogInTextfield extends StatefulWidget {
   final Function(String) onChanged;
   final VoidCallback onSubmit;
+  final bool error;
+  final String errorText;
 
-  const LogInTextfield({Key? key, required this.onChanged, required this.onSubmit}) : super(key: key);
+  const LogInTextfield({Key? key, required this.onChanged, required this.onSubmit, required this.error, required this.errorText}) : super(key: key);
 
   @override
   _LogInTextfield createState() => _LogInTextfield();
@@ -216,6 +274,7 @@ class _LogInTextfield extends State<LogInTextfield> {
 
   @override
   Widget build(BuildContext context) {
+    print(widget.error);
     return Focus(
       onFocusChange: (hasFocus) {
         setState(() {
@@ -237,15 +296,15 @@ class _LogInTextfield extends State<LogInTextfield> {
           focusColor: Colors.white.withOpacity(0.85),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(25),
-            borderSide: BorderSide(width: 1.4, color: Colors.white),
+            borderSide: BorderSide(width: 1.4, color: widget.error ? Colors.red[300]! : Colors.white),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(25),
-            borderSide: BorderSide(color: Colors.white),
+            borderSide: BorderSide(color: widget.error ? Colors.red[300]! : Colors.white),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(25),
-            borderSide: BorderSide(color: _hasText ? Colors.white : Colors.white.withOpacity(0.47)),
+            borderSide: BorderSide(color: widget.error ? Colors.red[300]! : Colors.white),
           ),
         ),
       ),
