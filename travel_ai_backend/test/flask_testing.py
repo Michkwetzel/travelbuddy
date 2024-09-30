@@ -8,9 +8,9 @@ firestore = FirestoreService()
 firestore.add_new_user('12123', 'qwert@gmail.com', 'michael')
 
 #
-# # Create a test client
+# # Create a flask_server client
 # with app.test_client() as client:
-#     # Prepare your test data
+#     # Prepare your flask_server data
 #     testData = {
 #         'userID': '6A1fdmwR5mKjrCEcQ7ZB',
 #         'chatID': 'Chat1',
