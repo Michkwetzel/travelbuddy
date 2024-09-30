@@ -96,13 +96,20 @@ def receive_user_message():
         # Save user message to cloud DB
         message_collection_path = f'users/{user_id}/chats/{chatroom_id}/messages'
         response = firestore.add_doc(doc_path=message_collection_path, fields_dict=user_message_entry)
-        print(f'message recieved. path: {message_collection_path}, message_fields: {user_message_entry} doc_ID: {response}')
+        print(f'message received. path: {message_collection_path}, message_fields: {user_message_entry} doc_ID: {response}')
 
         firestore.update_chatroom_latest_timestamp(user_id=user_id, chatroom_id=chatroom_id, timestamp=timestamp)
 
-        final_message = "System prompt: You are given chat history and user request. You are a travel agent helping the user with travel related enquiries, respond accordingly. Here is chathistory: "
+        file_path = '/Users/michaelwetzel/travelbuddy/travel_ai_backend/prompts/mainChatPrompt.txt'
+
+        # Open the file and read its contents
+        with open(file_path, 'r') as file:
+            systemPrompt = file.read()
+
+        final_message = systemPrompt
+
         chat_history.reverse()
-        for entry in chat_history:
+        for entry in chat_history[:16]:
             final_message += f'{entry}\n'
 
         final_message += f'Here is user request: {message}'

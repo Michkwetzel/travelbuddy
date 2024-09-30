@@ -4,6 +4,7 @@ import 'package:front_travelbuddy/change_notifiers/chat_history_provider.dart';
 import 'package:front_travelbuddy/change_notifiers/chat_state_provider.dart';
 import 'package:front_travelbuddy/change_notifiers/fire_base_stream_provider.dart';
 import 'package:front_travelbuddy/services/back_end_service.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:provider/provider.dart';
 
 class AppBarChatScreen extends StatelessWidget implements PreferredSizeWidget {
@@ -31,7 +32,7 @@ class AppBarChatScreen extends StatelessWidget implements PreferredSizeWidget {
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
                   fontSize: 20,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w300,
                   color: Colors.white,
                   decoration: TextDecoration.none,
                   fontFamily: 'Montserrat',
@@ -44,7 +45,7 @@ class AppBarChatScreen extends StatelessWidget implements PreferredSizeWidget {
             "Travel Buddy",
             style: TextStyle(
               fontSize: 30,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w300,
               color: Colors.white,
               decoration: TextDecoration.none,
               fontFamily: 'Montserrat',
@@ -94,61 +95,56 @@ class BottomTextFieldAndSendButton extends StatelessWidget {
       }
     }
 
-    return Column(children: [
-      Row(
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 15, top: 10),
+      child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Expanded(
-            child: Padding(
-              padding: const EdgeInsets.only(right: 25, left: 25, top: 10),
-              child: ConstrainedBox(
-                constraints: BoxConstraints(maxWidth: 500),
-                child: TextField(
-                  controller: messageTextController,
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: Colors.white,
-                    focusColor: Colors.white,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(color: Colors.white),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(color: Colors.white),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(color: Colors.white),
-                    ),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: 500),
+              child: TextField(
+                controller: messageTextController,
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Colors.white,
+                  focusColor: Colors.white,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: Colors.white),
                   ),
-                  onChanged: (value) {
-                    userMessage = value;
-                  },
-                  onSubmitted: (value) => onSubmit(),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: Colors.white),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: Colors.white),
+                  ),
                 ),
+                onChanged: (value) {
+                  userMessage = value;
+                },
+                onSubmitted: (value) => onSubmit(),
               ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.only(right: 25),
-            child: IconButton(
-                style: ButtonStyle(
-                  backgroundColor: WidgetStateProperty.all<Color>(Colors.white),
-                  shape: WidgetStateProperty.all<OutlinedBorder>(
-                    CircleBorder(), // Make the button circular
-                  ),
-                ),
-                onPressed: () => onSubmit(),
-                icon: Icon(Icons.send, color: Colors.black)),
+          SizedBox(
+            width: 15,
           ),
+          IconButton(
+              style: ButtonStyle(
+                backgroundColor: WidgetStateProperty.all<Color>(Colors.white),
+                shape: WidgetStateProperty.all<OutlinedBorder>(
+                  CircleBorder(), // Make the button circular
+                ),
+              ),
+              onPressed: () => onSubmit(),
+              icon: Icon(Icons.send, color: Colors.black)),
         ],
       ),
-      SizedBox(
-        height: 15,
-      )
-    ]);
+    );
   }
 }
 
@@ -164,7 +160,6 @@ class MessageDisplayWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     FireStoreStreamProvider streamProvider = Provider.of<FireStoreStreamProvider>(context);
     ChatHistoryProvider chatHistoryProvider = Provider.of<ChatHistoryProvider>(context);
-
 
     return Column(
       //Main Chat Tab
@@ -199,7 +194,7 @@ class MessageDisplayWidget extends StatelessWidget {
                 return Expanded(
                   child: ListView(
                     reverse: true,
-                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
                     children: messageWidgets,
                   ),
                 );
@@ -215,36 +210,48 @@ class MessageDisplayWidget extends StatelessWidget {
 
 class MessageBuble extends StatelessWidget {
   MessageBuble({required this.message, required this.sender, super.key});
-
   String message;
   final String sender;
 
   @override
   Widget build(BuildContext context) {
-    if (message.endsWith('\n')) {
-      message = message.replaceFirst(RegExp(r'\n$'), '');
+    var crossAxisAlignment = CrossAxisAlignment.start;
+    var edgeInsets = EdgeInsets.symmetric(vertical: 10);
+    var bubbleColor = Colors.white;
+    var fontWeight = FontWeight.w400;
+
+   
+
+    if (sender == 'user') {
+      crossAxisAlignment = CrossAxisAlignment.end;
+      edgeInsets = EdgeInsets.only(top: 10, bottom: 10, left: 100);
+      bubbleColor = Colors.lightBlue[100]!;
+      fontWeight = FontWeight.w500;
     }
+
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 10),
+      padding: edgeInsets,
       child: Column(
-        crossAxisAlignment: sender == 'assistant' ? CrossAxisAlignment.start : CrossAxisAlignment.end,
+        crossAxisAlignment: crossAxisAlignment,
         children: [
           Text(
             sender,
             style: TextStyle(fontSize: 10, color: Colors.white),
           ),
-          ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: 650),
-            child: Material(
-              borderRadius: BorderRadius.circular(20),
-              elevation: 7,
-              color: Colors.white,
-              child: Padding(
-                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-                  child: Text(
-                    message,
-                    style: TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.w900, fontFamily: 'Montserrat'),
-                  )),
+          Material(
+            borderRadius: BorderRadius.circular(20),
+            elevation: 7,
+            color: bubbleColor,
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+              child: MarkdownBody(
+                data: message,
+                styleSheet: MarkdownStyleSheet(
+                  p: TextStyle(color: Colors.black, fontSize: 16, fontWeight: fontWeight, fontFamily: 'Montserrat'),
+                  strong: TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.w500, fontFamily: 'Montserrat')
+                ),
+                selectable: true,
+              ),
             ),
           ),
         ],

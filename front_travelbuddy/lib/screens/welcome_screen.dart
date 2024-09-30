@@ -50,7 +50,7 @@ class WelcomeScreen extends StatelessWidget {
                     alignment: Alignment(0.25, -0.3),
                     child: Text(
                       "The world is a beautiful place",
-                      style: TextStyle(fontSize: width * 0.019 * temp, fontWeight: FontWeight.bold, color: Colors.white, decoration: TextDecoration.none, fontFamily: 'Montserrat'),
+                      style: TextStyle(fontSize: width * 0.019 * temp, fontWeight: FontWeight.w400, color: Colors.white, decoration: TextDecoration.none, fontFamily: 'Montserrat'),
                     ),
                   ),
                 ),
@@ -60,7 +60,7 @@ class WelcomeScreen extends StatelessWidget {
                 right: 0.215 * width,
                 child: Text(
                   'Let\'s learn about it',
-                  style: TextStyle(fontSize: width * 0.014 * temp, fontWeight: FontWeight.bold, color: Colors.white, decoration: TextDecoration.none, fontFamily: 'Montserrat'),
+                  style: TextStyle(fontSize: width * 0.014 * temp, fontWeight: FontWeight.w300, color: Colors.white, decoration: TextDecoration.none, fontFamily: 'Montserrat'),
                 ),
               ),
               Positioned(
@@ -77,7 +77,7 @@ class WelcomeScreen extends StatelessWidget {
                       child: TextButton(
                         onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => LogInScreen())),
                         child: Text('Log in',
-                            style: TextStyle(fontSize: width * 0.0135 * temp, fontWeight: FontWeight.bold, color: Colors.white, decoration: TextDecoration.none, fontFamily: 'Montserrat')),
+                            style: TextStyle(fontSize: width * 0.0135 * temp, fontWeight: FontWeight.w400, color: Colors.white, decoration: TextDecoration.none, fontFamily: 'Montserrat')),
                       ),
                     ),
                   ),
@@ -97,7 +97,7 @@ class WelcomeScreen extends StatelessWidget {
                       child: TextButton(
                         onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => RegisterScreen())),
                         child: Text('Sign up',
-                            style: TextStyle(fontSize: width * 0.0135 * temp, color: Colors.white, fontWeight: FontWeight.bold, decoration: TextDecoration.none, fontFamily: 'Montserrat')),
+                            style: TextStyle(fontSize: width * 0.0135 * temp, color: Colors.white, fontWeight: FontWeight.w400, decoration: TextDecoration.none, fontFamily: 'Montserrat')),
                       ),
                     ),
                   ),
@@ -202,7 +202,7 @@ class Iteration2WIdgetsResize extends StatelessWidget {
                                       alignment: Alignment(0.13, -0.1),
                                       child: TextButton(
                                         onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => RegisterScreen())),
-                                        child: Text('Sign up', style: TextStyle(fontSize: screenWidth * 0.014, color: Colors.white, decoration: TextDecoration.none)),
+                                        child: Text('Sign up', style: TextStyle(fontSize: screenWidth * 0.014, fontWeight: FontWeight.w100, color: Colors.white, decoration: TextDecoration.none)),
                                       ),
                                     ),
                                   ),
@@ -221,90 +221,5 @@ class Iteration2WIdgetsResize extends StatelessWidget {
         ),
       ),
     );
-  }
-}
-
-class MyWidget extends StatelessWidget {
-  const MyWidget({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
-      return Container(
-        decoration: BoxDecoration(
-          image: DecorationImage(image: AssetImage('assets/background/_4ed7e042-0cde-4836-bc0d-c155d0c50ba0.jpg'), fit: BoxFit.cover),
-        ),
-        child: Align(
-          alignment: Alignment.centerRight,
-          child: Padding(
-            padding: const EdgeInsets.only(right: 20.0),
-            child: Container(
-              width: 400,
-              height: 400,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  AspectRatio(
-                    aspectRatio: 10,
-                    child: Container(
-                      width: constraints.maxWidth * 0.5,
-                      height: constraints.maxHeight * 0.5,
-                      decoration: BoxDecoration(
-                        image: DecorationImage(
-                          image: AssetImage(
-                            'assets/brush_strokes/orange_1.png',
-                          ),
-                        ),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text("The world is a beautifull place", style: TextStyle(fontSize: constraints.maxWidth * 0.02, color: Colors.white, decoration: TextDecoration.none)),
-                          Text('Lets learn about it', style: TextStyle(fontSize: constraints.maxWidth * 0.02, color: Colors.white, decoration: TextDecoration.none)),
-                        ],
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 30,
-                  ),
-                  GestureDetector(
-                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => LogInScreen())),
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        Image.asset('assets/brush_strokes/orange_2.png'),
-                        Text(
-                          'Log in',
-                          style: TextStyle(fontSize: 25, color: Colors.white, decoration: TextDecoration.none),
-                        )
-                      ],
-                    ),
-                  ),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  GestureDetector(
-                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => RegisterScreen())),
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        Image.asset('assets/brush_strokes/orange_2.png'),
-                        Text(
-                          'Sign up',
-                          style: TextStyle(fontSize: 25, color: Colors.white, decoration: TextDecoration.none),
-                        )
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      );
-    });
   }
 }

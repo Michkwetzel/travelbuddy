@@ -157,7 +157,7 @@ class ChatRoomDrawer extends StatelessWidget {
                 height: 55,
               ),
               Padding(
-                padding: EdgeInsets.only(left: 29.6, bottom: 5),
+                padding: EdgeInsets.only(left: 29.6, bottom: 5, top: 5),
                 child: DrawerFunctionButton(
                     text: 'New Chat',
                     icon: Icon(

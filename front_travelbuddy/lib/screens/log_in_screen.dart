@@ -139,7 +139,7 @@ class _LogInScreenState extends State<LogInScreen> {
                       child: Text(
                         textAlign: TextAlign.center,
                         "Email",
-                        style: TextStyle(fontSize: 18, fontFamily: 'Montserrat', fontWeight: FontWeight.bold),
+                        style: TextStyle(fontSize: 18, fontFamily: 'Montserrat', fontWeight: FontWeight.normal),
                       ),
                     ),
                   ),
@@ -188,7 +188,7 @@ class _LogInScreenState extends State<LogInScreen> {
                       child: Text(
                         textAlign: TextAlign.center,
                         "Password",
-                        style: TextStyle(fontSize: 18, fontFamily: 'Montserrat', fontWeight: FontWeight.bold),
+                        style: TextStyle(fontSize: 18, fontFamily: 'Montserrat', fontWeight: FontWeight.normal),
                       ),
                     ),
                   ),
@@ -288,7 +288,7 @@ class _LogInTextfield extends State<LogInTextfield> {
           _updateHasText();
         },
         onSubmitted: (value) => widget.onSubmit(),
-        style: TextStyle(fontSize: 17, fontFamily: 'Montserrat', fontWeight: FontWeight.bold),
+        style: TextStyle(fontSize: 17, fontFamily: 'Montserrat', fontWeight: FontWeight.w400),
         textAlign: TextAlign.center,
         decoration: InputDecoration(
           filled: true,
