@@ -14,33 +14,40 @@ class LineBreak extends StatelessWidget {
     } else {
       paintColour = Colors.black;
     }
-    return LayoutBuilder(builder: (context, constraints) {
-      return Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 200,
-              color: paintColour,
-              height: 1,
-            ),
-            Padding(
-              child: Text(
-                'Or',
-                style: TextStyle(color: paintColour),
+    return Padding(
+      padding: const EdgeInsets.all(10.0),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Flexible(
+            child: Container(
+              constraints: BoxConstraints(
+                maxWidth: 200, // Set maximum width
               ),
-              padding: EdgeInsets.symmetric(horizontal: 10),
-            ),
-            Container(
-              width: 200,
               color: paintColour,
               height: 1,
             ),
-          ],
-        ),
-      );
-    });
+          ),
+          Padding(
+            child: Text(
+              'Or',
+              style: TextStyle(color: paintColour),
+            ),
+            padding: EdgeInsets.symmetric(horizontal: 10),
+          ),
+          Flexible(
+            child: Container(
+              constraints: BoxConstraints(
+                maxWidth: 200,
+              ),
+              color: paintColour,
+              height: 1,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -67,7 +74,10 @@ class GoogleSignInButton extends StatelessWidget {
             SizedBox(
               width: 6,
             ),
-            Text('Sign in with Google', style: TextStyle(fontSize: 14, fontFamily: 'Roboto', fontWeight: FontWeight.w400, color: Colors.black87),)
+            Text(
+              'Sign in with Google',
+              style: TextStyle(fontSize: 14, fontFamily: 'Roboto', fontWeight: FontWeight.w400, color: Colors.black87),
+            )
           ],
         ),
       ),

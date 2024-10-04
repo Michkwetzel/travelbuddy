@@ -2,27 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:front_travelbuddy/screens/chatbot_screen.dart';
 import 'package:front_travelbuddy/widgets/widgets.dart';
-import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:provider/provider.dart';
-import 'package:front_travelbuddy/change_notifiers/spinner.dart';
 import 'package:front_travelbuddy/services/auth_service.dart';
-
-class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({super.key});
-
-  @override
-  State<RegisterScreen> createState() => _RegisterScreenState();
-}
-
-class _RegisterScreenState extends State<RegisterScreen> {
-  String userEmail = '';
-  String userPassword = '';
-
-  @override
-  Widget build(BuildContext context) {
-    return LogInScreenCopy();
-  }
-}
 
 class CenteredScrollView extends StatefulWidget {
   final Widget child;
@@ -51,7 +32,7 @@ class _CenteredScrollViewState extends State<CenteredScrollView> {
     if (!_scrollController.hasClients) return;
     final double maxScroll = _scrollController.position.maxScrollExtent;
     final double currentScroll = _scrollController.offset;
-    final double center = maxScroll / 2;
+    final double center = maxScroll*0.75;
     _scrollController.animateTo(
       center,
       duration: Duration(milliseconds: 300),
@@ -74,22 +55,100 @@ class _CenteredScrollViewState extends State<CenteredScrollView> {
   }
 }
 
-class LogInScreenCopy extends StatefulWidget {
-  const LogInScreenCopy({super.key});
+class RegisterScreen extends StatefulWidget {
+  const RegisterScreen({super.key});
 
   @override
-  State<LogInScreenCopy> createState() => _LogInScreenCopyState();
+  State<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _LogInScreenCopyState extends State<LogInScreenCopy> {
+class _RegisterScreenState extends State<RegisterScreen> {
+  void emailVertificationDialog(BuildContext context, String message) {
+    // Implement your email verification dialog here
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          double width;
+          double height;
+          double windowRatio = constraints.maxWidth / constraints.maxHeight;
+
+          if (windowRatio < 1822 / 1030) {
+            height = constraints.maxHeight;
+            width = constraints.maxHeight * 1822 / 1030;
+          } else {
+            height = constraints.maxWidth * 1030 / 1822;
+            width = constraints.maxWidth;
+          }
+
+          if (constraints.maxWidth < 600) {
+            return Stack(
+              alignment: Alignment.center,
+              children: [
+                CenteredScrollView(
+                  scrollDirection: Axis.vertical,
+                  child: CenteredScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Container(
+                      width: width,
+                      height: height,
+                      child: Image.asset(
+                        'assets/background/sign_up_camel.png',
+                        fit: BoxFit.cover,
+                        width: width,
+                        height: height,
+                      ),
+                    ),
+                  ),
+                ),
+                Center(child: RegisterWidgets())
+              ],
+            );
+          } else {
+            return CenteredScrollView(
+              scrollDirection: Axis.vertical,
+              child: CenteredScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Container(
+                  width: width,
+                  height: height,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Image.asset(
+                        'assets/background/log_in_camel2.jpg',
+                        fit: BoxFit.cover,
+                        width: width,
+                        height: height,
+                      ),
+                      RegisterWidgets()
+                    ],
+                  ),
+                ),
+              ),
+            );
+          }
+        },
+      ),
+    );
+  }
+}
+
+class RegisterWidgets extends StatefulWidget {
+  const RegisterWidgets({super.key});
+
+  @override
+  State<RegisterWidgets> createState() => _RegisterWidgetsState();
+}
+
+class _RegisterWidgetsState extends State<RegisterWidgets> {
   String userEmail = '';
   String userPassword = '';
   String errorText = '';
   bool error = false;
-
-  void emailVertificationDialog(BuildContext context, String message) {
-    // Implement your email verification dialog here
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -127,169 +186,136 @@ class _LogInScreenCopyState extends State<LogInScreenCopy> {
       }
     }
 
-    return Scaffold(
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          double width;
-          double height;
-          double windowRatio = constraints.maxWidth / constraints.maxHeight;
-
-          if (windowRatio < 1822 / 1030) {
-            height = constraints.maxHeight;
-            width = constraints.maxHeight * 1822 / 1030;
-          } else {
-            height = constraints.maxWidth * 1030 / 1822;
-            width = constraints.maxWidth;
-          }
-
-          return CenteredScrollView(
-            scrollDirection: Axis.vertical,
-            child: CenteredScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Container(
-                width: width,
-                height: height,
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    Image.asset(
-                      'assets/background/log_in_camel2.jpg',
-                      fit: BoxFit.cover,
-                      width: width,
-                      height: height,
-                    ),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          height: 60,
-                          width: 400,
-                          decoration: BoxDecoration(
-                            image: DecorationImage(
-                              opacity: 0.89,
-                              colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
-                              fit: BoxFit.fill,
-                              image: AssetImage('assets/brush_strokes/blue_4.png'),
-                            ),
-                          ),
-                          child: Center(
-                            child: Text(
-                              "Learn about the world",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 35,
-                                fontFamily: 'Bhavuka',
-                              ),
-                            ),
-                          ),
-                        ),
-                        Text('By creating an account you get access to the free version of TravelBuddy'),
-                        Container(
-                          height: 40,
-                          width: 70,
-                          decoration: BoxDecoration(
-                            image: DecorationImage(
-                              opacity: 0.89,
-                              colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
-                              fit: BoxFit.fill,
-                              image: AssetImage('assets/brush_strokes/blue_2.png'),
-                            ),
-                          ),
-                          child: Center(
-                            child: Text(
-                              "Email",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(fontSize: 18, fontFamily: 'Montserrat', fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          width: 500,
-                          height: 48,
-                          child: LogInTextfield(error: error ,onChanged: (value) {
-                            userEmail = value;
-                          }, onSubmit: () {
-                            setState(() {
-                              error = false;
-                            });
-                            createAccount();
-                          }),
-                        ),
-                        if (error)
-                          Container(
-                            height: 25,
-                            width: 170,
-                            decoration: BoxDecoration(
-                              image: DecorationImage(
-                                opacity: 0.89,
-                                colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
-                                fit: BoxFit.fill,
-                                image: AssetImage('assets/brush_strokes/blue_2.png'),
-                              ),
-                            ),
-                            child: Center(
-                              child: Text(
-                                errorText,
-                                style: TextStyle(color: Colors.red[300], fontSize: 13, fontWeight: FontWeight.w300),
-                              ),
-                            ),
-                          ),
-                        Container(
-                          height: 40,
-                          width: 100,
-                          decoration: BoxDecoration(
-                            image: DecorationImage(
-                              opacity: 0.89,
-                              colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
-                              fit: BoxFit.fill,
-                              image: AssetImage('assets/brush_strokes/blue_2.png'),
-                            ),
-                          ),
-                          child: Center(
-                            child: Text(
-                              "Password",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(fontSize: 18, fontFamily: 'Montserrat', fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                            width: 500,
-                            height: 48,
-                            child: LogInTextfield(
-                              error: error,
-                              onChanged: (value) {
-                                userPassword = value;
-                              },
-                              onSubmit: () => createAccount(),
-                            )),
-                        SizedBox(
-                          height: 20,
-                        ),
-                        ElevatedButton(
-                          onPressed: () => createAccount(),
-                          child: Text("Create Acount", style: TextStyle(fontSize: 13, fontFamily: 'Roboto', fontWeight: FontWeight.normal, color: Colors.black87)),
-                        ),
-                        SizedBox(
-                          width: 20,
-                        ),
-                        LineBreak(colour: 'black'),
-                        GoogleSignInButton(
-                          onPressed: () async {
-                            await Provider.of<AuthService>(context, listen: false).signInWithGoogle(
-                              nextScreenCall: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ChatbotScreen())),
-                            );
-                          },
-                        )
-                      ],
-                    ),
-                  ],
-                ),
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Container(
+          height: 60,
+          width: 400,
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              opacity: 0.89,
+              colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
+              fit: BoxFit.fill,
+              image: AssetImage('assets/brush_strokes/blue_4.png'),
+            ),
+          ),
+          child: Center(
+            child: Text(
+              "Learn about the world",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 35,
+                fontFamily: 'Bhavuka',
               ),
             ),
-          );
-        },
-      ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal:  10.0),
+          child: Text('By creating an account you get access to the free version of TravelBuddy', textAlign: TextAlign.center,),
+        ),
+        Container(
+          height: 40,
+          width: 70,
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              opacity: 0.89,
+              colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
+              fit: BoxFit.fill,
+              image: AssetImage('assets/brush_strokes/blue_2.png'),
+            ),
+          ),
+          child: Center(
+            child: Text(
+              "Email",
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 18, fontFamily: 'Montserrat', fontWeight: FontWeight.normal),
+            ),
+          ),
+        ),
+        SizedBox(
+          width: 500,
+          height: 48,
+          child: LogInTextfield(
+              error: error,
+              onChanged: (value) {
+                userEmail = value;
+              },
+              onSubmit: () {
+                setState(() {
+                  error = false;
+                });
+                createAccount();
+              }),
+        ),
+        if (error)
+          Container(
+            height: 25,
+            width: 170,
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                opacity: 0.89,
+                colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                fit: BoxFit.fill,
+                image: AssetImage('assets/brush_strokes/blue_2.png'),
+              ),
+            ),
+            child: Center(
+              child: Text(
+                errorText,
+                style: TextStyle(color: Colors.red[300], fontSize: 13, fontWeight: FontWeight.w300),
+              ),
+            ),
+          ),
+        Container(
+          height: 40,
+          width: 100,
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              opacity: 0.89,
+              colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
+              fit: BoxFit.fill,
+              image: AssetImage('assets/brush_strokes/blue_2.png'),
+            ),
+          ),
+          child: Center(
+            child: Text(
+              "Password",
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 18, fontFamily: 'Montserrat', fontWeight: FontWeight.normal),
+            ),
+          ),
+        ),
+        SizedBox(
+            width: 500,
+            height: 48,
+            child: LogInTextfield(
+              error: error,
+              onChanged: (value) {
+                userPassword = value;
+              },
+              onSubmit: () => createAccount(),
+            )),
+        SizedBox(
+          height: 20,
+        ),
+        ElevatedButton(
+          onPressed: () => createAccount(),
+          child: Text("Create Acount", style: TextStyle(fontSize: 13, fontFamily: 'Roboto', fontWeight: FontWeight.normal, color: Colors.black87)),
+        ),
+        SizedBox(
+          width: 20,
+        ),
+        LineBreak(colour: 'white'),
+        GoogleSignInButton(
+          onPressed: () async {
+            await Provider.of<AuthService>(context, listen: false).signInWithGoogle(
+              nextScreenCall: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ChatbotScreen())),
+            );
+          },
+        )
+      ],
     );
   }
 }
@@ -337,30 +363,33 @@ class _LogInTextfield extends State<LogInTextfield> {
           _isFocused = hasFocus;
         });
       },
-      child: TextField(
-        controller: _controller,
-        onChanged: (value) {
-          widget.onChanged(value);
-          _updateHasText();
-        },
-        onSubmitted: (value) => widget.onSubmit(),
-        style: TextStyle(fontSize: 17, fontFamily: 'Montserrat', fontWeight: FontWeight.bold),
-        textAlign: TextAlign.center,
-        decoration: InputDecoration(
-          filled: true,
-          fillColor: _isFocused || _hasText ? Colors.white.withOpacity(0.85) : Colors.white.withOpacity(0.40),
-          focusColor: Colors.white.withOpacity(0.85),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(25),
-            borderSide: BorderSide(width: 0.1, color: widget.error ? Colors.red[300]! : Colors.white),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(25),
-            borderSide: BorderSide(color: widget.error ? Colors.red[300]! : Colors.white),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(25),
-            borderSide: BorderSide(color: widget.error ? Colors.red[300]! : Colors.white),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 15.0),
+        child: TextField(
+          controller: _controller,
+          onChanged: (value) {
+            widget.onChanged(value);
+            _updateHasText();
+          },
+          onSubmitted: (value) => widget.onSubmit(),
+          style: TextStyle(fontSize: 17, fontFamily: 'Montserrat', fontWeight: FontWeight.normal),
+          textAlign: TextAlign.center,
+          decoration: InputDecoration(
+            filled: true,
+            fillColor: _isFocused || _hasText ? Colors.white.withOpacity(0.85) : Colors.white.withOpacity(0.40),
+            focusColor: Colors.white.withOpacity(0.85),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(25),
+              borderSide: BorderSide(width: 0.1, color: widget.error ? Colors.red[300]! : Colors.white),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(25),
+              borderSide: BorderSide(color: widget.error ? Colors.red[300]! : Colors.white),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(25),
+              borderSide: BorderSide(color: widget.error ? Colors.red[300]! : Colors.white),
+            ),
           ),
         ),
       ),

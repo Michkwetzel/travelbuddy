@@ -6,6 +6,7 @@ import 'package:front_travelbuddy/change_notifiers/fire_base_stream_provider.dar
 import 'package:front_travelbuddy/change_notifiers/user_model.dart';
 import 'package:front_travelbuddy/screens/chatbot_screen.dart';
 import 'package:front_travelbuddy/screens/log_in_screen.dart';
+import 'package:front_travelbuddy/screens/register_screen.dart';
 import 'package:front_travelbuddy/screens/welcome_screen.dart';
 import 'package:front_travelbuddy/services/auth_service.dart';
 import 'package:front_travelbuddy/services/back_end_service.dart';
@@ -62,7 +63,7 @@ void main() async {
       child: MaterialApp(
         title: 'TravelBuddy',
         theme: ThemeData(fontFamily: 'Roboto'),
-        home: ChatbotScreen(),
+        home: WelcomeScreen(),
       ),
     ),
   );

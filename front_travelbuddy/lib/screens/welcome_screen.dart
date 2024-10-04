@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:front_travelbuddy/screens/log_in_screen.dart';
 import 'package:front_travelbuddy/screens/register_screen.dart';
 
+
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({Key? key}) : super(key: key);
 
@@ -185,12 +186,9 @@ class Iteration2WIdgetsResize extends StatelessWidget {
                                   height: brushHeight * 0.5,
                                   width: brushWidth * 0.5,
                                   decoration: BoxDecoration(image: DecorationImage(image: AssetImage('assets/brush_strokes/orange_3.png'))),
-                                  child: Align(
-                                    alignment: Alignment(0.13, -0.1),
-                                    child: TextButton(
-                                      onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => LogInScreen())),
-                                      child: Text('Log in', style: TextStyle(fontSize: screenWidth * 0.014, color: Colors.white, decoration: TextDecoration.none)),
-                                    ),
+                                  child: TextButton(
+                                    onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => LogInScreen())),
+                                    child: Text('Log in', style: TextStyle(fontSize: screenWidth * 0.014, color: Colors.white, decoration: TextDecoration.none)),
                                   ),
                                 ),
                                 Container(
@@ -198,12 +196,9 @@ class Iteration2WIdgetsResize extends StatelessWidget {
                                   width: brushWidth * 0.5,
                                   decoration: BoxDecoration(image: DecorationImage(image: AssetImage('assets/brush_strokes/orange_3.png'))),
                                   child: Center(
-                                    child: Align(
-                                      alignment: Alignment(0.13, -0.1),
-                                      child: TextButton(
-                                        onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => RegisterScreen())),
-                                        child: Text('Sign up', style: TextStyle(fontSize: screenWidth * 0.014, fontWeight: FontWeight.w100, color: Colors.white, decoration: TextDecoration.none)),
-                                      ),
+                                    child: TextButton(
+                                      onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => RegisterScreen())),
+                                      child: Text('Sign up', style: TextStyle(fontSize: screenWidth * 0.014, fontWeight: FontWeight.w100, color: Colors.white, decoration: TextDecoration.none)),
                                     ),
                                   ),
                                 )
