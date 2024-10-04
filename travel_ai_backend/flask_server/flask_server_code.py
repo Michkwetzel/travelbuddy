@@ -146,3 +146,4 @@ def check_required_fields(request_body, required_fields):
         return False, missing_fields  # Return False and a list of missing fields
 
     return True, None
+
