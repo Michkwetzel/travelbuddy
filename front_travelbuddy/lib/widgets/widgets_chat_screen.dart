@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:front_travelbuddy/change_notifiers/chat_history_provider.dart';
 import 'package:front_travelbuddy/change_notifiers/chat_state_provider.dart';
 import 'package:front_travelbuddy/change_notifiers/fire_base_stream_provider.dart';
+import 'package:front_travelbuddy/change_notifiers/spinner.dart';
 import 'package:front_travelbuddy/screens/welcome_screen.dart';
 import 'package:front_travelbuddy/services/auth_service.dart';
 import 'package:front_travelbuddy/services/back_end_service.dart';
@@ -33,21 +34,21 @@ class AppBarChatScreen extends StatelessWidget implements PreferredSizeWidget {
       title: Row(
         children: [
           if (!mobile)
-          SizedBox(
-            width: 150,
-            child: Text(
-              chatStateProvider.currentChatroomName,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w300,
-                color: Colors.white,
-                decoration: TextDecoration.none,
-                fontFamily: 'Montserrat',
+            SizedBox(
+              width: 150,
+              child: Text(
+                chatStateProvider.currentChatroomName,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w300,
+                  color: Colors.white,
+                  decoration: TextDecoration.none,
+                  fontFamily: 'Montserrat',
+                ),
               ),
             ),
-          ),
           Spacer(),
           Text(
             "Travel Buddy",
@@ -59,7 +60,7 @@ class AppBarChatScreen extends StatelessWidget implements PreferredSizeWidget {
               fontFamily: 'Montserrat',
             ),
           ),
-          SizedBox(width: mobile ? 56 :  150 + 76),
+          SizedBox(width: mobile ? 56 : 150 + 76),
           Spacer()
         ],
       ),
@@ -194,11 +195,13 @@ class MessageDisplayWidget extends StatelessWidget {
                 List<String> messageHistory = [];
 
                 final messages = snapshot.data!.docs;
+                String role = '';
                 List<MessageBuble> messageWidgets = [];
+
                 for (var message in messages) {
                   Map<String, dynamic> data = message.data() as Map<String, dynamic>;
                   final text = data['message'];
-                  final role = data['role'];
+                  role = data['role'];
                   final messageWidget = MessageBuble(message: text, sender: role);
                   messageHistory.add('role: $role, message: $text');
                   messageWidgets.add(messageWidget);
@@ -323,7 +326,7 @@ class ChatRoomDrawer extends StatelessWidget {
               ),
               ChatRoomStreamBuilder(controller: controller),
               Padding(
-                padding: const EdgeInsets.only(left: 35.75, bottom: 15),
+                padding: const EdgeInsets.only(left: 35.75, bottom: 15, top: 150),
                 child: DrawerFunctionButton(
                     controller: controller,
                     onTap: () => authService.signOut(

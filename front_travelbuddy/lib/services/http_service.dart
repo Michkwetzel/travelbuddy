@@ -6,7 +6,7 @@ import 'package:http/http.dart';
 class HttpService {
   final String baseUrl;
 
-  HttpService({this.baseUrl = 'http://127.0.0.1:5000/'});
+  HttpService({this.baseUrl = 'https://travelbuddyback-570991179221.us-central1.run.app/'});
 
   /// Sends post request to flask server. returns response.body
   /// Throws errors if responce code != 200 and any other errors

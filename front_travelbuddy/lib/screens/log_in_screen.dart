@@ -1,5 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:front_travelbuddy/change_notifiers/spinner.dart';
+import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:provider/provider.dart';
 import 'package:front_travelbuddy/screens/chatbot_screen.dart';
 import 'package:front_travelbuddy/services/auth_service.dart';
@@ -25,65 +27,73 @@ class LogInScreen extends StatelessWidget {
           label: Text("Forget Password?", style: TextStyle(fontSize: 15, fontFamily: 'Bhavuka', fontWeight: FontWeight.w600, color: Colors.black)),
         ),
       ),
-      body: LayoutBuilder(builder: (context, constraints) {
-        double width;
-        double height;
-        double windowRatio = constraints.maxWidth / constraints.maxHeight;
+      body: ModalProgressHUD(
+        progressIndicator: CircularProgressIndicator(
+          color: Colors.white,
+        ),
+        inAsyncCall: Provider.of<Spinner>(context).spinner,
+        opacity: 0,
+        blur: 0.2,
+        child: LayoutBuilder(builder: (context, constraints) {
+          double width;
+          double height;
+          double windowRatio = constraints.maxWidth / constraints.maxHeight;
 
-        if (windowRatio < 1792 / 1024) {
-          height = constraints.maxHeight;
-          width = constraints.maxHeight * 1792 / 1024;
-        } else {
-          height = constraints.maxWidth * 1024 / 1792;
-          width = constraints.maxWidth;
-        }
-
-        if (constraints.maxWidth < 600) {
-          //Mobile display
-          double scale = 1;
-          if (constraints.maxWidth < 410) {
-            scale = (410 - constraints.maxWidth) * 0.1;
+          if (windowRatio < 1792 / 1024) {
+            height = constraints.maxHeight;
+            width = constraints.maxHeight * 1792 / 1024;
+          } else {
+            height = constraints.maxWidth * 1024 / 1792;
+            width = constraints.maxWidth;
           }
 
-          print('mobile');
-          return Stack(alignment: Alignment.center, fit: StackFit.loose, children: [
-            CenteredScrollView(
-              child: CenteredScrollView(
-                scrollDirection: Axis.horizontal,
-                child: ConstrainedBox(
-                  constraints: BoxConstraints.expand(height: height, width: width),
-                  child: Image.asset(
-                    'assets/background/log_in_ocean.jpg',
-                    fit: BoxFit.fill,
-                  ),
-                ),
-              ),
-            ),
-            Center(child: LogInWidgets(scale: scale))
-          ]);
-        } else {
-          //Desktop display
-          return CenteredScrollView(
-            child: CenteredScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Stack( 
-                alignment: Alignment.center,
-                fit: StackFit.loose,
-                children: [
-                  ConstrainedBox(
+          if (constraints.maxWidth < 500) {
+            //Mobile display
+            double scale = 1;
+            if (constraints.maxWidth < 410) {
+              scale = (410 - constraints.maxWidth) * 0.1;
+            }
+
+            print('mobile');
+            return Stack(alignment: Alignment.center, fit: StackFit.loose, children: [
+              CenteredScrollView(
+                child: CenteredScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: ConstrainedBox(
                     constraints: BoxConstraints.expand(height: height, width: width),
                     child: Image.asset(
                       'assets/background/log_in_ocean.jpg',
                       fit: BoxFit.fill,
                     ),
                   ),
-                  LogInWidgets()
-                ],
+                ),
               ),
-            ),
-          );
-        }
-      }),
+              Center(child: LogInWidgets(scale: scale))
+            ]);
+          } else {
+            //Desktop display
+            return CenteredScrollView(
+              child: CenteredScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Stack(
+                  alignment: Alignment.center,
+                  fit: StackFit.loose,
+                  children: [
+                    ConstrainedBox(
+                      constraints: BoxConstraints.expand(height: height, width: width),
+                      child: Image.asset(
+                        'assets/background/log_in_ocean.jpg',
+                        fit: BoxFit.fill,
+                      ),
+                    ),
+                    LogInWidgets()
+                  ],
+                ),
+              ),
+            );
+          }
+        }),
+      ),
     );
   }
 }
@@ -103,8 +113,10 @@ class _LogInWidgetsState extends State<LogInWidgets> {
   bool error = false;
   @override
   Widget build(BuildContext context) {
+    Spinner spinner = Provider.of<Spinner>(context, listen: false);
     void logIn() async {
       try {
+        spinner.showSpinner();
         await Provider.of<AuthService>(context, listen: false).signInWithEmailAndPassword(
           userEmail: userEmail,
           userPassword: userPassword,
@@ -125,11 +137,14 @@ class _LogInWidgetsState extends State<LogInWidgets> {
         if (e.code == 'network-request-failed') {
           errorMessage = "Connection lost";
         }
+        spinner.hideSpinner();
         setState(() {
           error = true;
           errorText = errorMessage;
         });
       } catch (e) {
+        spinner.hideSpinner();
+
         setState(() {
           error = true;
         });
@@ -354,7 +369,6 @@ class _LogInTextfield extends State<LogInTextfield> {
 
 //passwordResetDialog(context, (email) => Provider.of<AuthService>(context, listen: false).resetPassword(userEmail: email))
 
-
 class CenteredScrollView extends StatefulWidget {
   final Widget child;
   final Axis scrollDirection;
@@ -382,7 +396,7 @@ class _CenteredScrollViewState extends State<CenteredScrollView> {
     if (!_scrollController.hasClients) return;
     final double maxScroll = _scrollController.position.maxScrollExtent;
     final double currentScroll = _scrollController.offset;
-    final double center = maxScroll*0.4;
+    final double center = maxScroll * 0.4;
     _scrollController.animateTo(
       center,
       duration: Duration(milliseconds: 300),
@@ -404,4 +418,3 @@ class _CenteredScrollViewState extends State<CenteredScrollView> {
     );
   }
 }
-

@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:front_travelbuddy/change_notifiers/chat_state_provider.dart';
 import 'package:front_travelbuddy/change_notifiers/spinner.dart';
 import 'package:front_travelbuddy/change_notifiers/user_model.dart';
 import 'back_end_service.dart';
@@ -52,6 +51,7 @@ class AuthService {
     required String userPassword,
     required Function() emailVerificationPopUp,
   }) async {
+    print("Show spinner");
     dynamic newUserCred;
     newUserCred = await _auth.createUserWithEmailAndPassword(email: userEmail, password: userPassword);
     _auth.currentUser?.sendEmailVerification();
@@ -83,7 +83,6 @@ class AuthService {
       nextScreenCall?.call();
       return userCred;
     } on Exception catch (e) {
-      spinner.hideSpinner();
       print('error: $e');
       return null;
     }
@@ -120,8 +119,11 @@ class AuthService {
 
   Future<void> resetPassword({required String userEmail}) async {
     try {
+      spinner.showSpinner();
       await _auth.sendPasswordResetEmail(email: userEmail);
+      spinner.hideSpinner();
     } catch (e) {
+      spinner.hideSpinner();
       print(e);
     }
   }

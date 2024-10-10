@@ -1,7 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:front_travelbuddy/change_notifiers/spinner.dart';
 import 'package:front_travelbuddy/screens/chatbot_screen.dart';
 import 'package:front_travelbuddy/widgets/widgets.dart';
+import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:provider/provider.dart';
 import 'package:front_travelbuddy/services/auth_service.dart';
 
@@ -32,7 +34,7 @@ class _CenteredScrollViewState extends State<CenteredScrollView> {
     if (!_scrollController.hasClients) return;
     final double maxScroll = _scrollController.position.maxScrollExtent;
     final double currentScroll = _scrollController.offset;
-    final double center = maxScroll*0.75;
+    final double center = maxScroll * 0.75;
     _scrollController.animateTo(
       center,
       duration: Duration(milliseconds: 300),
@@ -63,75 +65,79 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
-  void emailVertificationDialog(BuildContext context, String message) {
-    // Implement your email verification dialog here
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          double width;
-          double height;
-          double windowRatio = constraints.maxWidth / constraints.maxHeight;
+      body: ModalProgressHUD(
+        progressIndicator: CircularProgressIndicator(
+          color: Colors.white,
+        ),
+        inAsyncCall: Provider.of<Spinner>(context).spinner,
+        opacity: 0,
+        blur: 0.2,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            double width;
+            double height;
+            double windowRatio = constraints.maxWidth / constraints.maxHeight;
 
-          if (windowRatio < 1822 / 1030) {
-            height = constraints.maxHeight;
-            width = constraints.maxHeight * 1822 / 1030;
-          } else {
-            height = constraints.maxWidth * 1030 / 1822;
-            width = constraints.maxWidth;
-          }
+            if (windowRatio < 1822 / 1030) {
+              height = constraints.maxHeight;
+              width = constraints.maxHeight * 1822 / 1030;
+            } else {
+              height = constraints.maxWidth * 1030 / 1822;
+              width = constraints.maxWidth;
+            }
 
-          if (constraints.maxWidth < 600) {
-            return Stack(
-              alignment: Alignment.center,
-              children: [
-                CenteredScrollView(
-                  scrollDirection: Axis.vertical,
-                  child: CenteredScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Container(
-                      width: width,
-                      height: height,
-                      child: Image.asset(
-                        'assets/background/sign_up_camel.png',
-                        fit: BoxFit.cover,
+            if (constraints.maxWidth < 500) {
+              return Stack(
+                alignment: Alignment.center,
+                children: [
+                  CenteredScrollView(
+                    scrollDirection: Axis.vertical,
+                    child: CenteredScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Container(
                         width: width,
                         height: height,
+                        child: Image.asset(
+                          'assets/background/sign_up_camel.png',
+                          fit: BoxFit.cover,
+                          width: width,
+                          height: height,
+                        ),
                       ),
                     ),
                   ),
-                ),
-                Center(child: RegisterWidgets())
-              ],
-            );
-          } else {
-            return CenteredScrollView(
-              scrollDirection: Axis.vertical,
-              child: CenteredScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Container(
-                  width: width,
-                  height: height,
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      Image.asset(
-                        'assets/background/log_in_camel2.jpg',
-                        fit: BoxFit.cover,
-                        width: width,
-                        height: height,
-                      ),
-                      RegisterWidgets()
-                    ],
+                  Center(child: RegisterWidgets())
+                ],
+              );
+            } else {
+              return CenteredScrollView(
+                scrollDirection: Axis.vertical,
+                child: CenteredScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Container(
+                    width: width,
+                    height: height,
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        Image.asset(
+                          'assets/background/log_in_camel2.jpg',
+                          fit: BoxFit.cover,
+                          width: width,
+                          height: height,
+                        ),
+                        RegisterWidgets()
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            );
-          }
-        },
+              );
+            }
+          },
+        ),
       ),
     );
   }
@@ -152,8 +158,10 @@ class _RegisterWidgetsState extends State<RegisterWidgets> {
 
   @override
   Widget build(BuildContext context) {
+    Spinner spinner = Provider.of<Spinner>(context, listen: false);
     void createAccount() async {
       try {
+        spinner.showSpinner();
         await Provider.of<AuthService>(context, listen: false).createUserWithEmailAndPassword(
           userEmail: userEmail,
           userPassword: userPassword,
@@ -173,11 +181,13 @@ class _RegisterWidgetsState extends State<RegisterWidgets> {
         if (e.code == 'weak-password') {
           errorMessage = 'Weak Password';
         }
+        spinner.hideSpinner();
         setState(() {
           error = true;
           errorText = errorMessage;
         });
       } catch (e) {
+        spinner.hideSpinner();
         print(e);
         setState(() {
           error = true;
@@ -212,8 +222,11 @@ class _RegisterWidgetsState extends State<RegisterWidgets> {
           ),
         ),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal:  10.0),
-          child: Text('By creating an account you get access to the free version of TravelBuddy', textAlign: TextAlign.center,),
+          padding: const EdgeInsets.symmetric(horizontal: 10.0),
+          child: Text(
+            'By creating an account you get access to the free version of TravelBuddy',
+            textAlign: TextAlign.center,
+          ),
         ),
         Container(
           height: 40,
