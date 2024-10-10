@@ -1,0 +1,24 @@
+2024/10/01-10:37:27.246 a703 Reusing MANIFEST /private/var/folders/x4/lcqz837x3ydg6ffnnp40tskm0000gn/T/flutter_tools.Sy0Ey8/flutter_tools_chrome_device.iMSvt7/Default/IndexedDB/http_localhost_53546.indexeddb.leveldb/MANIFEST-000001
+2024/10/01-10:37:27.248 a703 Recovering log #13
+2024/10/01-10:37:27.250 a703 Reusing old log /private/var/folders/x4/lcqz837x3ydg6ffnnp40tskm0000gn/T/flutter_tools.Sy0Ey8/flutter_tools_chrome_device.iMSvt7/Default/IndexedDB/http_localhost_53546.indexeddb.leveldb/000013.log 
+2024/10/01-10:37:27.272 af03 Manual compaction at level-0 from '\x00\x08\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x09\x00\x00\x00' @ 0 : 0; will stop at (end)
+2024/10/01-10:42:21.293 af03 Level-0 table #18: started
+2024/10/01-10:42:21.314 af03 Level-0 table #18: 25969 bytes OK
+2024/10/01-10:42:21.320 af03 Delete type=0 #13
+2024/10/01-10:42:21.323 9e03 Manual compaction at level-0 from '\x00\x09\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x0a\x00\x00\x00' @ 0 : 0; will stop at (end)
+2024/10/01-10:43:00.496 9e03 Compacting 1@1 + 1@2 files
+2024/10/01-10:43:00.502 9e03 Generated table #19@1: 41 keys, 3783 bytes
+2024/10/01-10:43:00.502 9e03 Compacted 1@1 + 1@2 files => 3783 bytes
+2024/10/01-10:43:00.511 9e03 compacted to: files[ 0 0 1 0 0 0 0 ]
+2024/10/01-10:43:00.512 9e03 Delete type=2 #15
+2024/10/01-10:43:00.512 9e03 Delete type=2 #18
+2024/10/01-10:47:07.078 af03 Level-0 table #21: started
+2024/10/01-10:47:07.087 af03 Level-0 table #21: 22405 bytes OK
+2024/10/01-10:47:07.094 af03 Delete type=0 #17
+2024/10/01-10:47:07.095 9e03 Manual compaction at level-0 from '\x00\x0a\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x0b\x00\x00\x00' @ 0 : 0; will stop at (end)
+2024/10/01-10:47:47.086 9e03 Compacting 1@1 + 1@2 files
+2024/10/01-10:47:47.094 9e03 Generated table #22@1: 41 keys, 3791 bytes
+2024/10/01-10:47:47.094 9e03 Compacted 1@1 + 1@2 files => 3791 bytes
+2024/10/01-10:47:47.104 9e03 compacted to: files[ 0 0 1 0 0 0 0 ]
+2024/10/01-10:47:47.105 9e03 Delete type=2 #21
+2024/10/01-10:47:47.105 9e03 Delete type=2 #19
