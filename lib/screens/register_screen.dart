@@ -161,13 +161,13 @@ class _RegisterWidgetsState extends State<RegisterWidgets> {
     Spinner spinner = Provider.of<Spinner>(context, listen: false);
     void createAccount() async {
       try {
-        spinner.showSpinner();
+        //spinner.showSpinner();
         await Provider.of<AuthService>(context, listen: false).createUserWithEmailAndPassword(
           userEmail: userEmail,
           userPassword: userPassword,
           emailVerificationPopUp: () => emailVertificationDialog(context, 'A verification link has been sent to your email.\nPlease verify your account and log in.'),
         );
-        spinner.hideSpinner();
+        //spinner.hideSpinner();
       } on FirebaseAuthException catch (e) {
         String errorMessage = 'Invalid';
         if (e.code == 'email-already-in-use') {
@@ -182,13 +182,13 @@ class _RegisterWidgetsState extends State<RegisterWidgets> {
         if (e.code == 'weak-password') {
           errorMessage = 'Weak Password';
         }
-        spinner.hideSpinner();
+        //spinner.hideSpinner();
         setState(() {
           error = true;
           errorText = errorMessage;
         });
       } catch (e) {
-        spinner.hideSpinner();
+        //spinner.hideSpinner();
         print(e);
         setState(() {
           error = true;
