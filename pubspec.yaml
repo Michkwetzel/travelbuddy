@@ -98,7 +98,7 @@ flutter:
       fonts:
         - asset: assets/fonts/Roboto-Light.ttf
           weight: 300
-        - asset: assets/fonts/Roboto-bold.ttf
+        - asset: assets/fonts/Roboto-Bold.ttf
           weight: 700
         - asset: assets/fonts/Roboto-Regular.ttf
           weight: 400
