@@ -63,7 +63,7 @@ void main() async {
       child: MaterialApp(
         title: 'TravelBuddy',
         theme: ThemeData(fontFamily: 'Roboto'),
-        home: RegisterScreen(),
+        home: WelcomeScreen(),
       ),
     ),
   );
