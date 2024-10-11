@@ -167,6 +167,7 @@ class _RegisterWidgetsState extends State<RegisterWidgets> {
           userPassword: userPassword,
           emailVerificationPopUp: () => emailVertificationDialog(context, 'A verification link has been sent to your email.\nPlease verify your account and log in.'),
         );
+        spinner.hideSpinner();
       } on FirebaseAuthException catch (e) {
         String errorMessage = 'Invalid';
         if (e.code == 'email-already-in-use') {
