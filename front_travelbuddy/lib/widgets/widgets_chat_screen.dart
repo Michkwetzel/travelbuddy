@@ -185,11 +185,17 @@ class MessageDisplayWidget extends StatelessWidget {
             builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
               try {
                 if (snapshot.hasError) {
-                  return const Text('Something went wrong');
+                  return const Text(
+                    'Something went wrong',
+                    style: TextStyle(color: Colors.white),
+                  );
                 }
 
                 if (snapshot.connectionState == ConnectionState.waiting || !snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                  return const Text("Loading");
+                  return const Text(
+                    "Loading",
+                    style: TextStyle(color: Colors.white),
+                  );
                 }
 
                 List<String> messageHistory = [];

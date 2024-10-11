@@ -51,7 +51,6 @@ class AuthService {
     required String userPassword,
     required Function() emailVerificationPopUp,
   }) async {
-    print("Show spinner");
     dynamic newUserCred;
     newUserCred = await _auth.createUserWithEmailAndPassword(email: userEmail, password: userPassword);
     _auth.currentUser?.sendEmailVerification();

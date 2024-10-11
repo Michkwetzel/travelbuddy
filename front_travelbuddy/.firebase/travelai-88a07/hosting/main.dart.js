@@ -93767,7 +93767,7 @@ return this.auC(a,b)},
 auC(a,b){var s=0,r=A.H(t.Wd),q,p=2,o,n,m,l,k,j,i,h,g
 var $async$nR=A.C(function(c,d){if(c===1){o=d
 s=p}while(true)switch(s){case 0:i=B.uQ
-h=A.ib("http://127.0.0.1:5000/"+a)
+h=A.ib("https://travelbuddyback-570991179221.us-central1.run.app/"+a)
 p=4
 A.bK("Attempt to make post request. URL: "+A.e(h)+", request: "+b.k(0)+", headers: "+A.e(i)+" ")
 s=7
