@@ -49,7 +49,7 @@ class BackEndService {
   Future<String> deleteChatroom({required String chatroomID}) async {
     try {
       spinner.showSpinner();
-      const String path = 'delete_chatroom';
+      const String path = 'https://delete-chatroom-3zk5a74c4q-uc.a.run.app';
       final Map<String, dynamic> request = {'userID': userModel.currentUser, 'chatroomID': chatroomID};
       print('Delete chatroom request: $request');
       final response = await http.postRequest(path: path, request: request);
@@ -70,7 +70,7 @@ class BackEndService {
     try {
       spinner.showSpinner();
 
-      const String path = 'edit_chatroom_description';
+      const String path = 'https://edit-chatroom-description-3zk5a74c4q-uc.a.run.app';
       final Map<String, dynamic> request = {'userID': userModel.currentUser, 'chatroomID': chatroomID, 'newDescription': newDescription};
 
       final response = await http.postRequest(path: path, request: request);
@@ -81,14 +81,14 @@ class BackEndService {
       spinner.hideSpinner();
     } on Exception catch (e) {
       spinner.hideSpinner();
-      print('Error changing chatroom name');
+      print('Error changing chatroom name ${e.toString()}');
     }
   }
 
   Future<String> createNewChatroom() async {
     try {
       spinner.showSpinner();
-      const String path = 'create_new_chatroom';
+      const String path = 'https://create-new-chatroom-3zk5a74c4q-uc.a.run.app';
       final Map<String, dynamic> request = {'userID': userModel.currentUser};
 
       final response = await http.postRequest(path: path, request: request);
@@ -100,7 +100,7 @@ class BackEndService {
       return chatroomID;
     } on Exception catch (e) {
       spinner.hideSpinner();
-      print('error creating new chatroom. Error: $e');
+      print('error creating new chatroom. Error: ${e.toString()}');
       return '';
     }
   }
@@ -108,7 +108,7 @@ class BackEndService {
   Future<String> addNewUser({required userCred}) async {
     //Send request to back end to add a new user profile to DB
     try {
-      const String path = 'create_new_user_profile';
+      const String path = 'https://create-new-user-profile-3zk5a74c4q-uc.a.run.app';
 
       final Map<String, dynamic> profileData = {
         'userID': userCred.user?.uid,
@@ -127,17 +127,23 @@ class BackEndService {
   Future<String> sendMessage({required String chatRoomID, required String userMessage}) async {
     try {
       spinner.showSpinner();
-      String userID = userModel.currentUser;
-      List<String> chatHistory = chatHistoryProvider.chatHistory;
+
+      final String userID = userModel.currentUser;
+      final List<String> chatHistory = chatHistoryProvider.chatHistory;
+
       print('Send message called for user $userID');
 
-      Map<String, dynamic> request = {'userID': userID, 'chatroomID': chatRoomID, 'message': userMessage, 'chatHistory': chatHistory};
+      final request = {'userID': userID, 'chatroomID': chatRoomID, 'message': userMessage, 'chatHistory': chatHistory};
 
-      var response = await http.postRequest(path: '/receive_user_massage', request: request);
-      var log = response.body;
-      print('Message sent and response received: $log');
+      final response = await http.postRequest(path: 'https://receive-user-message-3zk5a74c4q-uc.a.run.app', request: request);
+
       spinner.hideSpinner();
-      return response.body;
+
+      if (response.statusCode == 200) {
+        return response.body;
+      } else {
+        throw ('Request failed with status: ${response.statusCode}');
+      }
     } catch (e) {
       spinner.hideSpinner();
       print('Error sending message: $e');

@@ -48,15 +48,13 @@ class _ChatbotScreenState extends State<ChatbotScreen> with SingleTickerProvider
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
-    bool mobile = false;
-    if (size.width < 600){
-      mobile = true;
-    }
 
     return Scaffold(
       body: ModalProgressHUD(
-        offset: Offset(size.width/2, size.height*0.8),
-        progressIndicator: CircularProgressIndicator(color: Colors.white,),
+        offset: Offset(size.width / 2, size.height * 0.8),
+        progressIndicator: CircularProgressIndicator(
+          color: Colors.white,
+        ),
         inAsyncCall: Provider.of<Spinner>(context).spinner,
         opacity: 0,
         blur: 0,
@@ -95,7 +93,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> with SingleTickerProvider
                 if (size.width < 1024) {
                   drawerColor = Colors.black.withOpacity(0.4);
                 }
-        
+
                 return Container(
                   color: drawerColor,
                   child: Stack(

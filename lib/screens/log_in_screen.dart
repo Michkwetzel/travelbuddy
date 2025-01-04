@@ -395,7 +395,6 @@ class _CenteredScrollViewState extends State<CenteredScrollView> {
   void _centerScroll() {
     if (!_scrollController.hasClients) return;
     final double maxScroll = _scrollController.position.maxScrollExtent;
-    final double currentScroll = _scrollController.offset;
     final double center = maxScroll * 0.4;
     _scrollController.animateTo(
       center,

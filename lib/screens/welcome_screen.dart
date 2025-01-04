@@ -87,7 +87,9 @@ class MobileWelcomeScreen extends StatelessWidget {
       Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          SizedBox(height: screenHeight * 0.3,),
+          SizedBox(
+            height: screenHeight * 0.3,
+          ),
           Container(
             decoration: BoxDecoration(
               image: DecorationImage(
@@ -278,7 +280,6 @@ class _CenteredScrollViewState extends State<CenteredScrollView> {
   void _centerScroll() {
     if (!_scrollController.hasClients) return;
     final double maxScroll = _scrollController.position.maxScrollExtent;
-    final double currentScroll = _scrollController.offset;
     final double center = maxScroll * 0.5;
     _scrollController.animateTo(
       center,
