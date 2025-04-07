@@ -53,7 +53,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> with SingleTickerProvider
       body: ModalProgressHUD(
         offset: Offset(size.width / 2, size.height * 0.8),
         progressIndicator: CircularProgressIndicator(
-          color: Colors.white,
+          color: Colors.blue,
         ),
         inAsyncCall: Provider.of<Spinner>(context).spinner,
         opacity: 0,

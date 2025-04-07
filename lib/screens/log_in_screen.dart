@@ -29,7 +29,7 @@ class LogInScreen extends StatelessWidget {
       ),
       body: ModalProgressHUD(
         progressIndicator: CircularProgressIndicator(
-          color: Colors.white,
+          color: Colors.blue,
         ),
         inAsyncCall: Provider.of<Spinner>(context).spinner,
         opacity: 0,
